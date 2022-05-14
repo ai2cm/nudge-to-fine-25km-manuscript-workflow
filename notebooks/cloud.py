@@ -2,6 +2,7 @@ import os
 
 import fsspec
 import pandas as pd
+import vcm
 import vcm.fv3
 import xarray as xr
 
@@ -22,3 +23,8 @@ def open_tape_sequence(rundirs, tape, concat_dim="climate"):
         datasets[key] = open_tape(rundir, tape)
     index = pd.Index(datasets.keys(), name=concat_dim)
     return xr.concat(datasets.values(), dim=index)
+
+
+def open_remote_nc(url):
+    fs, *_ = fsspec.get_fs_token_paths(url)
+    return vcm.open_remote_nc(fs, url)
