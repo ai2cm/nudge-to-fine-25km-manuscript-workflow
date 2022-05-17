@@ -1,4 +1,5 @@
 import dataclasses
+import datetime
 import logging
 import os
 import typing
@@ -17,7 +18,7 @@ logging.basicConfig(level=logging.INFO)
 
 TARGET_TIMES = xr.cftime_range("2018-08", "2023-10", freq="MS", calendar="julian")
 CLIMATES = ["Minus 4 K", "Unperturbed", "Plus 4 K", "Plus 8 K"]
-DESTINATION = fsspec.get_mapper("gs://vcm-ml-scratch/spencerc/2022-05-14/post-processed-data.zarr")
+DESTINATION = fsspec.get_mapper("gs://vcm-ml-scratch/spencerc/2022-05-16-n2f-25-km/post-processed-data.zarr")
 
 
 def reindex_like_months(ds, times):
@@ -50,6 +51,7 @@ class Store:
     climate: str
     variables: typing.List[str]
     rename: typing.Dict[str, str]
+    time_offset: typing.Optional[datetime.timedelta] = None
     compute_nudging_precip: typing.Optional[bool] = False
 
     @property
@@ -58,7 +60,11 @@ class Store:
 
     def open_raw(self):
         ds = xr.open_zarr(self.mapper)
-        return vcm.fv3.standardize_fv3_diagnostics(ds)
+        ds = vcm.fv3.standardize_fv3_diagnostics(ds)
+        if self.time_offset is not None:
+            return ds.assign_coords(time=ds.time + self.time_offset)
+        else:
+            return ds
 
     def open_variables(self):
         logging.info(f"Opening {self.url}")
@@ -86,7 +92,8 @@ class Store:
         # Allow for some tolerance for missing data (really only needed for nudged
         # runs that are missing a single timestep at the beginning and end months,
         # because they were started an hour into the August 2017).
-        mask = samples_per_month == np.rint(samples_per_month.time.dt.days_in_month)
+        mask = np.abs(samples_per_month - samples_per_month.time.dt.days_in_month) < 1.0
+        samples_per_month = samples_per_month.time.dt.days_in_month.where(mask)
         ds = ds.assign(samples=samples_per_month)
         ds = ds.where(mask)
         return ds
@@ -155,7 +162,8 @@ TAPES = {
             "ULWRFsfc": "upward_longwave_radiative_flux_at_surface",
             "LHTFLsfc": "latent_heat_flux",
             "SHTFLsfc": "sensible_heat_flux"
-        }
+        },
+        "time_offset": datetime.timedelta(hours=-12)
     },
     "atmos_dt_atmos": {
         "variables": ["PWAT"],
@@ -193,7 +201,8 @@ NUDGED_TAPES = {
             "USWRFsfc_from_RRTMG": "upward_shortwave_radiative_flux_at_surface",
             "DLWRFsfc_from_RRTMG": "downward_longwave_radiative_flux_at_surface",
             "TMPsfc": "surface_temperature",
-        }
+        },
+        "time_offset": datetime.timedelta(hours=-1, minutes=-30)
     },
     "atmos_dt_atmos": {
         "variables": ["PWAT"],
@@ -234,7 +243,8 @@ FINE_RES_TAPES = {
             "SHTFLsfc": "sensible_heat_flux",
             "PRATEsfc": "total_precipitation_rate",
             "tsfc": "surface_temperature"
-        }
+        },
+        "time_offset": datetime.timedelta(minutes=-7, seconds=-30)
     }
 }
 

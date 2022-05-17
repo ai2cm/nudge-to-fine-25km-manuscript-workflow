@@ -1,3 +1,9 @@
 [submodule "fv3net"]
 	path = fv3net
 	url = https://github.com/ai2cm/fv3net.git
+[submodule "fv3net-nudged-or-baseline/fv3net"]
+	path = fv3net-nudged-or-baseline/fv3net
+	url = https://github.com/ai2cm/fv3net.git
+[submodule "fv3net-ml-corrected/fv3net"]
+	path = fv3net-ml-corrected/fv3net
+	url = https://github.com/ai2cm/fv3net.git

@@ -1,0 +1,35 @@
+random_seed: 0 
+model_type: dense
+hyperparameters:
+  loss:
+    loss_type: "mae"
+    scaling: "standard"
+  dense_network:
+    depth: 2
+    width: 128
+    kernel_regularizer:
+      name: "l2"
+      kwargs:
+        l: 0.0001
+  training_loop:
+    batch_size: 512
+    epochs: 24
+  optimizer_config:
+    name: Adam
+    kwargs:
+      learning_rate: 0.002
+  normalize_loss: true
+  input_variables:
+    - cos_zenith_angle
+    - surface_geopotential
+    - air_temperature
+    - specific_humidity
+  output_variables:
+    - dQ1
+    - dQ2
+  clip_config:
+    clip:
+      air_temperature:
+        start: 25
+      specific_humidity:
+        start: 25

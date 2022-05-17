@@ -10,7 +10,7 @@ import vcm.catalog
 FONTSIZE = 8
 
 
-def configure_style():
+def configure_style(legend_fontsize=FONTSIZE):
     proplot.config.use_style("default")
     proplot.rc["legend.facecolor"] = "white"  # Needed to prevent proplot errors
     proplot.rc["font.size"] = FONTSIZE
@@ -18,7 +18,7 @@ def configure_style():
     proplot.rc["axes.labelsize"] = FONTSIZE
     proplot.rc["xtick.labelsize"] = FONTSIZE
     proplot.rc["ytick.labelsize"] = FONTSIZE
-    proplot.rc["legend.fontsize"] = FONTSIZE
+    proplot.rc["legend.fontsize"] = legend_fontsize
     proplot.rc["figure.titlesize"] = FONTSIZE
 
 
@@ -87,10 +87,10 @@ def infer_run_kind(series):
     return result
 
 
-def to_plottable_dataframe(metrics, variable, region, metric, sample_mask):
+def to_plottable_dataframe(metrics, variable, region, metric, sample_mask, region_dim="region"):
     series = (
         metrics.isel(sample=sample_mask)
-        .sel(metric=metric, region=region)[variable]
+        .sel({"metric": metric, region_dim: region})[variable]
         .to_pandas()
         .stack()
         .stack()

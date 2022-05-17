@@ -7,7 +7,7 @@ import vcm.catalog
 import xarray as xr
 
 
-POST_PROCESSED_DATA = fsspec.get_mapper("gs://vcm-ml-scratch/spencerc/2022-05-14/post-processed-data.zarr")
+POST_PROCESSED_DATA = fsspec.get_mapper("gs://vcm-ml-scratch/spencerc/2022-05-16-n2f-25-km/post-processed-data.zarr")
 SPATIAL_DIMS = ["x", "y", "tile"]
 ZONAL_DIMS = ["lat", "pressure"]
 AS_AUG_CONFIGURATIONS = ["Fine resolution (year one)", "Fine resolution (year two)", "Nudged"]
@@ -120,6 +120,7 @@ def compute_zonal_mean_bias(ds):
     )
     zonal_mean = vcm.select.zonal_average_approximate(grid.lat, pressure_interpolated)
     zonal_mean = zonal_mean.assign_coords(sinlat=np.sin(np.deg2rad(zonal_mean.lat)))
+    zonal_mean = zonal_mean.assign_coords(pressure=zonal_mean.pressure / 100.0)  # Convert to hPa
 
     bias_year_one = zonal_mean - zonal_mean.sel(configuration="Fine resolution (year one)").sel(time="2018").squeeze("time")
     bias_year_two = zonal_mean - zonal_mean.sel(configuration="Fine resolution (year two)").sel(time="2018").squeeze("time")
