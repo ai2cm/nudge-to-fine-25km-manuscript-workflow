@@ -196,9 +196,6 @@ if __name__ == "__main__":
         dataarrays.append(ds)
     ds = xr.concat(dataarrays, dim="configuration").to_dataset()
 
-    # with dask.diagnostics.ProgressBar():
-    #     ds.to_zarr("simulated_diurnal_cycles.zarr")
-
     ds.partition.initialize_store("simulated_diurnal_cycles.zarr")
     ranks = 120
     for i in range(ranks):

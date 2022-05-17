@@ -9,4 +9,3 @@ images:
   newTag: 4c6ec30e80fdbf9f64ecd0e253c21ada146ba976
 - name: us.gcr.io/vcm-ml/prognostic_run
   newTag: 4c6ec30e80fdbf9f64ecd0e253c21ada146ba976
-
