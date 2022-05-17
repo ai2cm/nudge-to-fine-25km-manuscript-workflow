@@ -26,9 +26,11 @@ The white nodes in this graph are all steps that were completed on Gaea; the
 gray nodes are steps that were completed on Google Cloud infrastructure.  The
 `Makefile` in this repository corresponds to steps that were completed on Google
 Cloud; the labels of the nodes correspond to the names of `make` rules in the
-`Makefile`.  While a `Makefile` is not included for the simulations completed on
-Gaea, all configurations and example runscripts are provided for reference, as
-well as a link to the version of FV3GFS used in those runs.
+`Makefile`.  Before running any of the steps of the workflow on the cloud, the
+`create_environment` rule must be completed and the `fv3net` conda environment
+must be activated.  While a `Makefile` is not included for the simulations
+completed on Gaea, all configurations and example runscripts are provided for
+reference, as well as a link to the version of FV3GFS used in those runs.
 
 ### Generating the fine-resolution data (Gaea)
 
