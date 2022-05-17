@@ -1,0 +1,34 @@
+Enter following code at http://www.dagitty.net/dags.html to generate DAG diagram.
+
+dag {
+    bb="-4.906,-3.792,4.486,4.527"
+    "C384 runs" [adjusted,pos="-1.296,-1.522"]
+    "C48 spinup runs" [adjusted,pos="-1.296,-3.153"]
+    "C48 to C384 via chgres_cube" [adjusted,pos="-1.296,-2.347"]
+    baseline_runs [pos="-0.479,-0.161"]
+    create_derived_radiative_flux_model [pos="-3.882,2.554"]
+    create_figures [pos="0.093,2.109"]
+    extend_ml_corrected_seed_2_runs [pos="-3.157,4.154"]
+    initial_conditions [pos="-1.296,-0.790"]
+    ml_corrected_runs [pos="-3.143,3.462"]
+    nudged_runs [pos="-2.754,0.432"]
+    post_process_runs [pos="0.087,1.191"]
+    prescriber_reference [pos="-2.028,-0.179"]
+    train_base_radiative_flux_model [pos="-3.856,1.692"]
+    train_nudging_tendency_networks [pos="-2.119,2.551"]
+    training_dataset [pos="-3.409,1.035"]
+    "C384 runs" -> initial_conditions
+    "C48 spinup runs" -> "C48 to C384 via chgres_cube"
+    "C48 to C384 via chgres_cube" -> "C384 runs"
+    create_derived_radiative_flux_model -> ml_corrected_runs
+    initial_conditions -> baseline_runs
+    initial_conditions -> prescriber_reference
+    ml_corrected_runs -> extend_ml_corrected_seed_2_runs
+    nudged_runs -> training_dataset
+    post_process_runs -> create_figures
+    prescriber_reference -> nudged_runs
+    train_base_radiative_flux_model -> create_derived_radiative_flux_model
+    train_nudging_tendency_networks -> ml_corrected_runs
+    training_dataset -> train_base_radiative_flux_model
+    training_dataset -> train_nudging_tendency_networks
+}
