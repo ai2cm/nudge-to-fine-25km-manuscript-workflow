@@ -21,6 +21,7 @@ PROGNOSTIC_RUN_START_DATE=20180801.000000
 PRESCRIBER_REFERENCE_ROOT=gs://vcm-ml-intermediate/2021-04-30-nudge-to-25-km-prescriber-datasets
 
 # ML training
+TRAINING_DATA=gs://vcm-ml-experiments/spencerc/2022-03-12/n2f-25km-tapered-25-snoalb-nudging-tendencies-and-fluxes.zarr
 TRAIN_ROOT=gs://vcm-ml-experiments/spencerc/2022-03-12-nudge-to-25-km-ml-models
 FLUXES_RF_BASE=$(TRAIN_ROOT)/fluxes-rf-transmissivity-snoalb
 FLUXES_RF_DERIVED=$(TRAIN_ROOT)/fluxes-rf-transmissivity-snoalb-derived
@@ -74,6 +75,10 @@ baseline_run_%: deploy_nudged_or_baseline
 
 
 # ML training
+training_dataset:
+	python ./notebooks/generate_training_dataset.py $(TRAINING_DATA)
+
+
 train_base_radiative_flux_model: deploy_ml_corrected
 	./workflows/scripts/train-rf.sh \
 		workflows/ml-training/fluxes-rf-base.yaml \
