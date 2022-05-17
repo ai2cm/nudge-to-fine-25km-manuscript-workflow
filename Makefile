@@ -28,7 +28,7 @@ FLUXES_RF_DERIVED=$(TRAIN_ROOT)/fluxes-rf-transmissivity-snoalb-derived
 TQ_NN=$(TRAIN_ROOT)/tq-nn-snoalb-tapered-clipped-25
 
 # Figures
-FIGURES = figure-01 figure-02 figure-03 figure-04 figure-05 figure-06 figure-07 figure-08 figure-09 figure-10 figure-11 figure-12 figure-13 table-02
+FIGURES = figure-01 figure-02 figure-03 figure-04 figure-05 figure-06 figure-07 figure-08 figure-09 figure-10 figure-11 figure-12 figure-13 table-02 nudging-tendency-offline-skill
 
 
 create_environment:
