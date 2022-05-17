@@ -140,10 +140,6 @@ kustomize:
 	./install_kustomize.sh 3.10.0
 
 
-deploy_notebooks: kustomize
-	./kustomize build notebooks/ | kubectl apply -f -
-
-
 deploy_nudged_or_baseline: kustomize
 	./kustomize build fv3net-nudged-or-baseline | kubectl apply -f -
 
