@@ -39,8 +39,8 @@ create_environment:
 
 # Patch the maximum snow albedo in restart files to address a coarse-graining error that
 # enters the initial conditions.
-patch_snoalb: $(addprefix patch_snoalb_in_initial_conditions_, $(CLIMATES))
-patch_snoalb_in_initial_conditions_%:
+initial_conditions: $(addprefix patch_snoalb_in_initial_conditions_, $(CLIMATES))
+initial_conditions_%:
 	python workflows/scripts/patch_snoalb.py \
 		$(C384_SFC_DATA_ROOT)/$*/sfc_data \
 		$(C384_AREA) \
@@ -50,8 +50,8 @@ patch_snoalb_in_initial_conditions_%:
 
 
 # Nudged runs
-generate_prescriber_reference: $(addprefix generate_prescriber_reference_, $(CLIMATES))
-generate_prescriber_reference_%:
+prescriber_reference: $(addprefix generate_prescriber_reference_, $(CLIMATES))
+prescriber_reference_%:
 	python workflows/scripts/generate_prescriber_reference_dataset.py \
 		$(C48_REFERENCE_ROOT)/$*/C384-to-C48-diagnostics/gfsphysics_15min_coarse.zarr \
 		$(PRESCRIBER_REFERENCE_ROOT)/$*/prescriber_reference.zarr
@@ -92,7 +92,7 @@ create_derived_radiative_flux_model: deploy_ml_corrected
 		$(FLUXES_RF_DERIVED)
 
 
-train_nudging_tendency_nn_seed_%: deploy_ml_corrected
+train_nudging_tendency_networks_%: deploy_ml_corrected
 	./workflows/scripts/train-nn.sh \
 		workflows/ml-training/tq-nn-training-config.yaml \
 		workflows/ml-training/training-data-config.yaml  \
@@ -121,7 +121,7 @@ extend_ml_corrected_seed_2_runs: deploy_ml_corrected
 
 
 # Post-processing and figure creation
-post_process_simulations:
+post_process_runs:
 	python post_processing.py
 	python metrics.py
 	python diurnal_cycle.py
