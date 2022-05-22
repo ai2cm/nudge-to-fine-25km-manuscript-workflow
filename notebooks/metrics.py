@@ -7,7 +7,7 @@ import vcm.catalog
 import xarray as xr
 
 
-POST_PROCESSED_DATA = fsspec.get_mapper("gs://vcm-ml-scratch/spencerc/2022-05-16-n2f-25-km/post-processed-data.zarr")
+POST_PROCESSED_DATA = fsspec.get_mapper("gs://vcm-ml-scratch/spencerc/2022-05-18-n2f-25-km/post-processed-data.zarr")
 SPATIAL_DIMS = ["x", "y", "tile"]
 ZONAL_DIMS = ["lat", "pressure"]
 AS_AUG_CONFIGURATIONS = ["Fine resolution (year one)", "Fine resolution (year two)", "Nudged"]
@@ -137,25 +137,45 @@ def net_surface_radiative_flux(ds):
     )
 
 
+def compute_climate_change_pattern(ds):
+    colder_climates = ["Minus 4 K", "Unperturbed", "Plus 4 K"]
+    warmer_climates = ["Unperturbed", "Plus 4 K", "Plus 8 K"]
+    climate_change_coord = [f"{warmer} minus {colder}" for colder, warmer in zip(colder_climates, warmer_climates)]
+    difference = (
+        ds.sel(climate=warmer_climates).drop("climate") - 
+        ds.sel(climate=colder_climates).drop("climate")
+    )
+    return difference.assign_coords(climate=climate_change_coord)
+
+
 if __name__ == "__main__":
     ds = xr.open_zarr(POST_PROCESSED_DATA)
     ds["net_surface_radiative_flux"] = net_surface_radiative_flux(ds)
     ds["total_precipitation_rate"] = SECONDS_PER_DAY * ds.total_precipitation_rate
     ds = ds[VARIABLES]
     annual_mean = compute_annual_mean(ds)
+    climate_change = compute_climate_change_pattern(annual_mean)
 
     with dask.diagnostics.ProgressBar():
-        annual_mean_bias_2d = compute_bias(annual_mean[VARIABLES_2D]).compute()  
+        annual_mean_bias_2d = compute_bias(annual_mean[VARIABLES_2D]).compute()
+        climate_change_bias_2d = compute_bias(climate_change[VARIABLES_2D]).compute()
     spatial_weights = compute_spatial_weights()
     annual_mean_metrics_2d = compute_spatial_metrics(annual_mean_bias_2d, spatial_weights)
+    climate_change_metrics_2d = compute_spatial_metrics(climate_change_bias_2d, spatial_weights)
 
     with dask.diagnostics.ProgressBar():
         annual_mean_bias_3d = compute_zonal_mean_bias(annual_mean[VARIABLES_3D]).compute()
+        climate_change_bias_3d = compute_zonal_mean_bias(climate_change[VARIABLES_3D]).compute()
     zonal_weights = compute_zonal_weights(annual_mean_bias_3d.lat, annual_mean_bias_3d.pressure)
     annual_mean_metrics_3d = compute_zonal_metrics(annual_mean_bias_3d, zonal_weights)
+    climate_change_metrics_3d = compute_zonal_metrics(climate_change_bias_3d, zonal_weights)
 
     merged_bias = xr.merge([annual_mean_bias_2d, annual_mean_bias_3d])
+    merged_climate_change_bias = xr.merge([climate_change_bias_2d, climate_change_bias_3d])
     merged_metrics = xr.merge([annual_mean_metrics_2d, annual_mean_metrics_3d])
+    merged_climate_change_metrics = xr.merge([climate_change_metrics_2d, climate_change_metrics_3d])
     with dask.diagnostics.ProgressBar():
         merged_bias.to_netcdf("annual_mean_bias.nc")
+        merged_climate_change_bias.to_netcdf("climate_change_bias.nc")
         merged_metrics.to_netcdf("annual_mean_metrics.nc")
+        merged_climate_change_metrics.to_netcdf("climate_change_metrics.nc")

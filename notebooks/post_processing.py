@@ -8,6 +8,8 @@ import dask.diagnostics
 import fsspec
 import numpy as np
 import pandas as pd
+import vcm
+import vcm.catalog
 import vcm.fv3
 import xarray as xr
 import xpartition
@@ -18,7 +20,8 @@ logging.basicConfig(level=logging.INFO)
 
 TARGET_TIMES = xr.cftime_range("2018-08", "2023-10", freq="MS", calendar="julian")
 CLIMATES = ["Minus 4 K", "Unperturbed", "Plus 4 K", "Plus 8 K"]
-DESTINATION = fsspec.get_mapper("gs://vcm-ml-scratch/spencerc/2022-05-16-n2f-25-km/post-processed-data.zarr")
+# DESTINATION = fsspec.get_mapper("gs://vcm-ml-scratch/spencerc/2022-05-16-n2f-25-km/post-processed-data.zarr")
+DESTINATION = fsspec.get_mapper("gs://vcm-ml-scratch/spencerc/2022-05-18-n2f-25-km/post-processed-data.zarr")
 
 
 def reindex_like_months(ds, times):
@@ -44,6 +47,16 @@ def compute_nudging_precipitation_diagnostics(ds):
     )
 
 
+def rotate_winds(ds):
+    matrix = vcm.catalog.catalog["wind_rotation/c48"].to_dask()
+    u, v = vcm.cubedsphere.center_and_rotate_xy_winds(
+        matrix,
+        ds.x_wind,
+        ds.y_wind
+    )
+    return ds.assign(eastward_wind=u, northward_wind=v).drop(["x_wind", "y_wind"])
+
+
 @dataclasses.dataclass
 class Store:
     url: str
@@ -53,6 +66,7 @@ class Store:
     rename: typing.Dict[str, str]
     time_offset: typing.Optional[datetime.timedelta] = None
     compute_nudging_precip: typing.Optional[bool] = False
+    rotate_winds: typing.Optional[bool] = False
 
     @property
     def mapper(self):
@@ -96,6 +110,8 @@ class Store:
         samples_per_month = samples_per_month.time.dt.days_in_month.where(mask)
         ds = ds.assign(samples=samples_per_month)
         ds = ds.where(mask)
+        if self.rotate_winds:
+            ds = rotate_winds(ds)
         return ds
 
 
@@ -176,7 +192,7 @@ TAPES = {
         "rename": {}
     },
     "state_after_timestep": {
-        "variables": ["surface_temperature", "air_temperature", "specific_humidity", "pressure_thickness_of_atmospheric_layer"],
+        "variables": ["surface_temperature", "air_temperature", "specific_humidity", "pressure_thickness_of_atmospheric_layer", "eastward_wind", "northward_wind"],
         "rename": {}
     },
 }
@@ -216,7 +232,7 @@ NUDGED_TAPES = {
         "compute_nudging_precip": True
     },
     "state_after_timestep": {
-        "variables": ["air_temperature", "specific_humidity", "pressure_thickness_of_atmospheric_layer"],
+        "variables": ["air_temperature", "specific_humidity", "pressure_thickness_of_atmospheric_layer", "eastward_wind", "northward_wind"],
         "rename": {}
     },
 }
@@ -251,12 +267,15 @@ FINE_RES_TAPES = {
 
 REFERENCE_TAPES = {
     "reference_state": {
-        "variables": ["air_temperature_reference", "specific_humidity_reference", "pressure_thickness_of_atmospheric_layer_reference"],
+        "variables": ["air_temperature_reference", "specific_humidity_reference", "pressure_thickness_of_atmospheric_layer_reference", "x_wind_reference", "y_wind_reference"],
         "rename": {
             "air_temperature_reference": "air_temperature",
             "specific_humidity_reference": "specific_humidity",
-            "pressure_thickness_of_atmospheric_layer_reference": "pressure_thickness_of_atmospheric_layer"
-        }
+            "pressure_thickness_of_atmospheric_layer_reference": "pressure_thickness_of_atmospheric_layer",
+            "x_wind_reference": "x_wind",
+            "y_wind_reference": "y_wind"
+        },
+        "rotate_winds": True
     }
 }
 
@@ -313,9 +332,11 @@ if __name__ == "__main__":
     result = result.chunk({"configuration": 1, "climate": 1})
     result = result.sel(climate=CLIMATES)  # Ensure climates are ordered from coldest to warmest
 
+    print(result)
+
     result.partition.initialize_store(DESTINATION)
-    ranks = 96
-    for i in range(ranks):
-        logging.info(f"Writing rank {i + 1} / {ranks}")
-        with dask.diagnostics.ProgressBar():
-            result.partition.write(DESTINATION, ranks, ["climate", "configuration", "time"], i)
+    # ranks = 96
+    # for i in range(ranks):
+    #     logging.info(f"Writing rank {i + 1} / {ranks}")
+    #     with dask.diagnostics.ProgressBar():
+    #         result.partition.write(DESTINATION, ranks, ["climate", "configuration", "time"], i)
