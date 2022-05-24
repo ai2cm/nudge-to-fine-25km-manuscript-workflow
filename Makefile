@@ -113,11 +113,16 @@ ml_corrected_run_%: deploy_ml_corrected
 		$(FLUX_RF_DERIVED)
 
 
-extend_ml_corrected_seed_2_runs: deploy_ml_corrected
+extend_ml_corrected_seed_2_and_3_runs: deploy_ml_corrected
 	./workflows/scripts/restart.sh gs://vcm-ml-experiments/spencerc/2022-03-29/n2f-25km-ml-corrected-v3-minus-4k-seed-2/fv3gfs_run 146
 	./workflows/scripts/restart.sh gs://vcm-ml-experiments/spencerc/2022-03-13/n2f-25km-ml-corrected-v3-unperturbed-seed-2/fv3gfs_run 146
 	./workflows/scripts/restart.sh gs://vcm-ml-experiments/spencerc/2022-03-29/n2f-25km-ml-corrected-v3-plus-4k-seed-2/fv3gfs_run 146
 	./workflows/scripts/restart.sh gs://vcm-ml-experiments/spencerc/2022-03-29/n2f-25km-ml-corrected-v3-plus-8k-seed-2/fv3gfs_run 146
+
+	./workflows/scripts/restart.sh gs://vcm-ml-experiments/spencerc/2022-03-29/n2f-25km-ml-corrected-v3-minus-4k-seed-3/fv3gfs_run 146
+	./workflows/scripts/restart.sh gs://vcm-ml-experiments/spencerc/2022-03-13/n2f-25km-ml-corrected-v3-unperturbed-seed-3/fv3gfs_run 146
+	./workflows/scripts/restart.sh gs://vcm-ml-experiments/spencerc/2022-03-29/n2f-25km-ml-corrected-v3-plus-4k-seed-3/fv3gfs_run 146
+	./workflows/scripts/restart.sh gs://vcm-ml-experiments/spencerc/2022-03-29/n2f-25km-ml-corrected-v3-plus-8k-seed-3/fv3gfs_run 146
 
 
 # Post-processing and figure creation
@@ -126,6 +131,7 @@ post_process_runs:
 	python metrics.py
 	python diurnal_cycle.py
 	python imerg_diurnal_cycle.py
+	python offline_r2.py
 
 
 create_figures: $(addprefix execute_notebook_, $(FIGURES))
@@ -141,8 +147,92 @@ kustomize:
 
 
 deploy_nudged_or_baseline: kustomize
-	./kustomize build fv3net-nudged-or-baseline | kubectl apply -f -
+	./kustomize build software/fv3net-nudged-or-baseline | kubectl apply -f -
 
 
 deploy_ml_corrected: kustomize
-	./kustomize build fv3net-ml-corrected | kubectl apply -f -
+	./kustomize build software/fv3net-ml-corrected | kubectl apply -f -
+
+
+# Code for the simulation on the left in Figure 2.  Note the ML models were
+# trained on a different set of nudged runs.  These nudged runs differ only in
+# that they used a different (biased) maximum snow albedo pattern.  This did not
+# affect nudging tendencies in a material way, but for maximum reproducibility,
+# we include the code used to generate these nudged runs and train those models
+# here.  
+nudged_runs_old: $(addprefix nudged_run_old_, $(CLIMATES))
+nudged_run_old_%: deploy_old_ml_corrected
+	workflows/scripts/run-nudged-test.sh \
+	$(call lower,$*) \
+	$(C48_REFERENCE_ROOT)/$*/C384-to-C48-restart-files \
+	workflows/nudged-runs/$(call lower,$*)-pre-snoalb.yaml
+
+
+OLD_MINUS_4K_N2F_DATA=gs://vcm-ml-experiments/spencerc/2021-05-11/n2f-25km-minus-4k/fv3gfs_run
+OLD_UNPERTURBED_N2F_DATA=gs://vcm-ml-experiments/spencerc/2021-05-11/n2f-25km-unperturbed/fv3gfs_run
+OLD_PLUS_4K_N2F_DATA=gs://vcm-ml-experiments/spencerc/2021-05-11/n2f-25km-plus-4k/fv3gfs_run
+OLD_PLUS_8K_N2F_DATA=gs://vcm-ml-experiments/spencerc/2021-08-11/n2f-25km-plus-8k/fv3gfs_run
+
+MINUS_4K_25KM_DIAGNOSTICS=$(C48_REFERENCE_ROOT)/minus-4K/C384-to-C48-diagnostics/gfsphysics_15min_coarse.zarr
+UNPERTURBED_25KM_DIAGNOSTICS=$(C48_REFERENCE_ROOT)/unperturbed/C384-to-C48-diagnostics/gfsphysics_15min_coarse.zarr
+PLUS_4K_25KM_DIAGNOSTICS=$(C48_REFERENCE_ROOT)/plus-4K/C384-to-C48-diagnostics/gfsphysics_15min_coarse.zarr
+PLUS_8K_25KM_DIAGNOSTICS=$(C48_REFERENCE_ROOT)/plus-8K/C384-to-C48-diagnostics/gfsphysics_15min_coarse.zarr
+
+OLD_FLUXES_TRAINING_DATA=gs://vcm-ml-experiments/spencerc/2021-07-02/all-climate-radiative-flux-training-data-transmissivity-8k.zarr
+OLD_TQ_NN=gs://vcm-ml-scratch/spencerc/2022-05-22/another-b22-like-tq-nn
+OLD_TQ_NN_ENSEMBLE=gs://vcm-ml-experiments/spencerc/2021-05-11/n2f-25km-models/all-climate-8k-tq-fixed-ensemble
+OLD_RF_BASE=gs://vcm-ml-experiments/spencerc/2021-05-11/n2f-25km-models/all-climate-8k-fluxes-transmissivity-base
+OLD_RF_DERIVED=gs://vcm-ml-experiments/spencerc/2021-05-11/n2f-25km-models/all-climate-8k-fluxes-derived-rf-transmissivity
+
+
+train_old_nudging_tendency_networks: deploy_old_ml_corrected
+	./workflows/scripts/train-old-nn.sh \
+		"$(OLD_MINUS_4K_N2F_DATA) $(OLD_UNPERTURBED_N2F_DATA) $(OLD_PLUS_4K_N2F_DATA) $(OLD_PLUS_8K_N2F_DATA)" \
+		workflows/ml-training/tq-nn-old.yaml \
+		workflows/ml-training/train.json \
+		$(OLD_TQ_NN)
+
+
+create_old_nudging_tendency_network_ensemble:
+	./workflows/scripts/create-ensemble.sh $(OLD_TQ_NN) $(OLD_TQ_NN_ENSEMBLE)
+
+
+# With the previous version of the code we only created a separate training
+# dataset for the radiative fluxes.  We could read the nudging tendencies
+# directly in from the run directories of the nudged runs.
+old_radiative_flux_training_dataset:
+	python workflows/scripts/generate_old_radiative_flux_training_dataset.py \
+	 	--fine-res $(MINUS_4K_25KM_DIAGNOSTICS) $(UNPERTURBED_25KM_DIAGNOSTICS) $(PLUS_4K_25KM_DIAGNOSTICS) $(PLUS_8K_25KM_DIAGNOSTICS) \
+	 	--coarse-res $(OLD_MINUS_4K_N2F_DATA)/state_after_timestep.zarr $(OLD_UNPERTURBED_N2F_DATA)/state_after_timestep.zarr $(OLD_PLUS_4K_N2F_DATA)/state_after_timestep.zarr $(OLD_PLUS_8K_N2F_DATA)/state_after_timestep.zarr \
+	 	--timesteps workflows/ml-training/train.json workflows/ml-training/test.json \
+	 	--output $(OLD_FLUXES_TRAINING_DATA)
+
+
+train_old_fluxes_random_forest_base: deploy_old_ml_corrected
+	./workflows/scripts/train-old-rf.sh \
+	$(OLD_FLUXES_TRAINING_DATA) \
+	workflows/ml-training/fluxes-rf-base-old.yaml \
+	workflows/ml-training/train.json \
+	$(OLD_RF_BASE)
+
+
+create_old_fluxes_derived_model:
+	./workflows/scripts/create-derived-model.sh $(abspath workflows/ml-training/fluxes-rf-derived-old.yaml) $(OLD_RF_DERIVED)
+
+
+# Indeed in this case we ran the ML-corrected simulation with the patched
+# maximum snow albedo in the initial conditions (unlike the nudged runs
+# associated with this particular experiment, where the maximum snow albedo was
+# not patched).
+ensemble_ml_corrected_run_unperturbed: deploy_old_ml_corrected
+	./workflows/scripts/run-ensemble-ml-corrected.sh \
+		ml-corrected-v1-ensemble-unperturbed \
+		$(PATCHED_RESTART_FILE_DESTINATION)/$* \
+		workflows/ml-corrected-runs/unperturbed.yaml \
+		$(OLD_TQ_NN_ENSEMBLE) \
+		192 \
+		$(OLD_RF_DERIVED)
+
+
+deploy_old_ml_corrected: kustomize
+	./kustomize build software/fv3net-old-ml-corrected | kubectl apply -f -

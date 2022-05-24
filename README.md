@@ -102,8 +102,8 @@ ML-corrected runs.  The baseline simulations are run using the `baseline_runs`
 rule.  The ML-corrected runs are first started with each of the neural networks
 trained with the four random seeds and are run for 15 months in each climate.
 Then, based on performance in the first 15 months, the simulations with the seed
-2 nudging tendency neural network are extended out to 63 months.  In each of the
-ML-corrected runs the same radiative flux derived model is used.
+2 and 3 nudging tendency neural networks are extended out to 63 months.  In each
+of the ML-corrected runs the same radiative flux derived model is used.
 
 ### Generating figures (Google Cloud)
 
