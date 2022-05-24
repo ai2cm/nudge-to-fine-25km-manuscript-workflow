@@ -1,9 +1,3 @@
-[submodule "software/fv3net-old-ensemble-simulation/fv3net"]
-	path = software/fv3net-old-ensemble-simulation/fv3net
-	url = https://github.com/ai2cm/fv3net.git
-[submodule "software/fv3net-old-ensemble-run/fv3net"]
-	path = software/fv3net-old-ensemble-run/fv3net
-	url = https://github.com/ai2cm/fv3net.git
 [submodule "software/fv3net-old-ml-corrected/fv3net"]
 	path = software/fv3net-old-ml-corrected/fv3net
 	url = https://github.com/ai2cm/fv3net.git
