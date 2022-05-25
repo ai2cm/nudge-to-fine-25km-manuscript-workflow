@@ -113,7 +113,7 @@ ml_corrected_run_%: deploy_ml_corrected
 		$(FLUX_RF_DERIVED)
 
 
-extend_ml_corrected_seed_2_and_3_runs: deploy_ml_corrected
+extend_ml_corrected_runs: deploy_ml_corrected
 	./workflows/scripts/restart.sh gs://vcm-ml-experiments/spencerc/2022-03-29/n2f-25km-ml-corrected-v3-minus-4k-seed-2/fv3gfs_run 146
 	./workflows/scripts/restart.sh gs://vcm-ml-experiments/spencerc/2022-03-13/n2f-25km-ml-corrected-v3-unperturbed-seed-2/fv3gfs_run 146
 	./workflows/scripts/restart.sh gs://vcm-ml-experiments/spencerc/2022-03-29/n2f-25km-ml-corrected-v3-plus-4k-seed-2/fv3gfs_run 146
