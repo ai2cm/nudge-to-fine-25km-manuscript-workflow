@@ -28,12 +28,12 @@ FLUXES_RF_DERIVED=$(TRAIN_ROOT)/fluxes-rf-transmissivity-snoalb-derived
 TQ_NN=$(TRAIN_ROOT)/tq-nn-snoalb-tapered-clipped-25
 
 # Figures
-FIGURES = figure-01 figure-02 figure-03 figure-04 figure-05 figure-06 figure-07 figure-08 figure-09 figure-10 figure-11 figure-12 figure-13 table-02 nudging-tendency-offline-skill
-
+FIGURES = figure-01 figure-02 figure-03 figure-04 figure-05 figure-06 figure-07 figure-08 figure-09 figure-10 figure-11 figure-12 figure-13 table-02 table-climate-change
+FIGURES = figure-10
 
 create_environment:
-	make -C fv3net-ml-corrected/fv3net update_submodules && \
-		make -C fv3net-ml-corrected/fv3net create_environment && \
+	make -C software/fv3net-ml-corrected/fv3net update_submodules && \
+		make -C software/fv3net-ml-corrected/fv3net create_environment && \
 		( $(CONDA_ACTIVATE) fv3net ; pip install faceted==0.2.1 ; pip install nc-time-axis==1.4.1 ; pip install proplot==0.9.5 ; pip install seaborn==0.11.2 ; pip install xhistogram==0.3.1 )
 
 
