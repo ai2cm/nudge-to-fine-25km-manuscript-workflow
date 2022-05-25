@@ -13,7 +13,7 @@ RADIATIVE_FLUX_MODEL=$7
 for SEED in $SEEDS
 do
     RANDOM=$(openssl rand --hex 6)
-    CONFIG=./workflows/ml-corrected-simulations/tmp-seed-$SEED.yaml
+    CONFIG=./workflows/ml-corrected-runs/tmp-seed-$SEED.yaml
     cp $BASE_CONFIG $CONFIG
     sed -i "s#RADIATIVE_FLUX_MODEL#$RADIATIVE_FLUX_MODEL#g" $CONFIG
 
