@@ -8,10 +8,17 @@ hereafter "B22," which applies the method described there in multi-year
 simulations and in multiple climates.
 
 The spinup and fine-resolution simulations described in the paper were each run
-on NOAA's Gaea computer, while the other components of this workflow -- nudged
-runs, baseline runs, ML-model-training, ML-corrected runs, and
+on NOAA's Gaea supercomputer, while the other components of this workflow --
+nudged runs, baseline runs, ML-model-training, ML-corrected runs, and
 post-processing/figure creation -- were run on Google Cloud, either on a cluster
-through the use of Argo workflows or locally on a virtual machine.
+through the use of Argo workflows or locally on a virtual machine.  
+
+The `notebooks` directory contains a sequence of notebooks that produce the
+figures and tables used in the manuscript.  The `software` directory contains
+submodules representing the snapshots of the fv3net and fv3gfs-fortran
+repositories used for the different runs in this project.  Finally, the
+`workflows` directory contains configuration and simple scripts for running
+simulations and training machine learning models.
 
 ## Workflow
 
@@ -57,7 +64,7 @@ To generate training data, we make use of the output produced by the C384
 simulations run on Gaea.  We start by running C48 resolution simulations nudged
 to the coarsened state of the C384 resolution model, which we output every
 fifteen minutes in the form of intermediate restart files from the C384 runs. In
-addition to nudging several atmosphere fields, we also prescribe values seen by
+addition to nudging several atmospheric fields, we also prescribe values seen by
 the land surface; these fields come from the diagnostics produced by the
 fine-resolution runs.
 
@@ -65,12 +72,14 @@ Before running these simulations, we start by patching the maximum snow albedo
 field in the individual sets of coarsened restart files we use as initial
 conditions in subsequent coarse-resolution simulations.  A flaw in the
 coarse-graining method used for this particular field led to biases in
-coarse-resolution simulations.  Then to enable prescribing fields to the land
-surface, we must first generate a "prescriber dataset" which our Python-wrapped
-version of the model can read as it runs.  These two steps are accomplished for
-each climate by the `initial_conditions` and `prescriber_reference` Makefile
-rules.  Once those two steps are complete, the nudged simulations can be
-submitted using the `nudged_runs` rule.
+coarse-resolution simulations.  The patching process coarse-grains this field
+using a more sensible approach (area-weighted average over the dominant surface
+type) and then writes it to a new set of restart files.  Then, to enable
+prescribing fields to the land surface, we must first generate a "prescriber
+dataset" which our Python-wrapped version of the model can read as it runs.
+These two steps are accomplished for each climate by the `initial_conditions`
+and `prescriber_reference` Makefile rules.  Once those two steps are complete,
+the nudged simulations can be submitted using the `nudged_runs` rule.
 
 ### Training machine learning models (Google Cloud)
 
