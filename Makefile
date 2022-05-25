@@ -162,10 +162,10 @@ deploy_ml_corrected: kustomize
 # here.  
 nudged_runs_old: $(addprefix nudged_run_old_, $(CLIMATES))
 nudged_run_old_%: deploy_old_ml_corrected
-	workflows/scripts/run-nudged-test.sh \
+	workflows/legacy/scripts/run-nudged.sh \
 	$(call lower,$*) \
 	$(C48_REFERENCE_ROOT)/$*/C384-to-C48-restart-files \
-	workflows/nudged-runs/$(call lower,$*)-pre-snoalb.yaml
+	workflows/legacy/nudged-runs/$(call lower,$*).yaml
 
 
 OLD_MINUS_4K_N2F_DATA=gs://vcm-ml-experiments/spencerc/2021-05-11/n2f-25km-minus-4k/fv3gfs_run
@@ -186,22 +186,22 @@ OLD_RF_DERIVED=gs://vcm-ml-experiments/spencerc/2021-05-11/n2f-25km-models/all-c
 
 
 train_old_nudging_tendency_networks: deploy_old_ml_corrected
-	./workflows/scripts/train-old-nn.sh \
+	./workflows/scripts/legacy/train-nn.sh \
 		"$(OLD_MINUS_4K_N2F_DATA) $(OLD_UNPERTURBED_N2F_DATA) $(OLD_PLUS_4K_N2F_DATA) $(OLD_PLUS_8K_N2F_DATA)" \
-		workflows/ml-training/tq-nn-old.yaml \
+		workflows/legacy/ml-training/tq-nn.yaml \
 		workflows/ml-training/train.json \
 		$(OLD_TQ_NN)
 
 
 create_old_nudging_tendency_network_ensemble:
-	./workflows/scripts/create-ensemble.sh $(OLD_TQ_NN) $(OLD_TQ_NN_ENSEMBLE)
+	./workflows/legacy/scripts/create-ensemble.sh $(OLD_TQ_NN) $(OLD_TQ_NN_ENSEMBLE)
 
 
 # With the previous version of the code we only created a separate training
 # dataset for the radiative fluxes.  We could read the nudging tendencies
 # directly in from the run directories of the nudged runs.
 old_radiative_flux_training_dataset:
-	python workflows/scripts/generate_old_radiative_flux_training_dataset.py \
+	python workflows/legacy/scripts/generate_old_radiative_flux_training_dataset.py \
 	 	--fine-res $(MINUS_4K_25KM_DIAGNOSTICS) $(UNPERTURBED_25KM_DIAGNOSTICS) $(PLUS_4K_25KM_DIAGNOSTICS) $(PLUS_8K_25KM_DIAGNOSTICS) \
 	 	--coarse-res $(OLD_MINUS_4K_N2F_DATA)/state_after_timestep.zarr $(OLD_UNPERTURBED_N2F_DATA)/state_after_timestep.zarr $(OLD_PLUS_4K_N2F_DATA)/state_after_timestep.zarr $(OLD_PLUS_8K_N2F_DATA)/state_after_timestep.zarr \
 	 	--timesteps workflows/ml-training/train.json workflows/ml-training/test.json \
@@ -209,15 +209,15 @@ old_radiative_flux_training_dataset:
 
 
 train_old_fluxes_random_forest_base: deploy_old_ml_corrected
-	./workflows/scripts/train-old-rf.sh \
+	./workflows/legacy/scripts/train-rf.sh \
 	$(OLD_FLUXES_TRAINING_DATA) \
-	workflows/ml-training/fluxes-rf-base-old.yaml \
+	workflows/legacy/ml-training/fluxes-rf-base.yaml \
 	workflows/ml-training/train.json \
 	$(OLD_RF_BASE)
 
 
 create_old_fluxes_derived_model:
-	./workflows/scripts/create-derived-model.sh $(abspath workflows/ml-training/fluxes-rf-derived-old.yaml) $(OLD_RF_DERIVED)
+	./workflows/scripts/create-derived-model.sh $(abspath workflows/legacy/ml-training/fluxes-rf-derived.yaml) $(OLD_RF_DERIVED)
 
 
 # Indeed in this case we ran the ML-corrected simulation with the patched
@@ -225,10 +225,10 @@ create_old_fluxes_derived_model:
 # associated with this particular experiment, where the maximum snow albedo was
 # not patched).
 ensemble_ml_corrected_run_unperturbed: deploy_old_ml_corrected
-	./workflows/scripts/run-ensemble-ml-corrected.sh \
+	./workflows/legacy/scripts/run-ensemble-ml-corrected.sh \
 		ml-corrected-v1-ensemble-unperturbed \
 		$(PATCHED_RESTART_FILE_DESTINATION)/$* \
-		workflows/ml-corrected-runs/unperturbed.yaml \
+		workflows/legacy/ml-corrected-runs/unperturbed.yaml \
 		$(OLD_TQ_NN_ENSEMBLE) \
 		192 \
 		$(OLD_RF_DERIVED)
