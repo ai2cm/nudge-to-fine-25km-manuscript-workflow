@@ -7,7 +7,7 @@ import vcm.catalog
 import xarray as xr
 
 
-POST_PROCESSED_DATA = fsspec.get_mapper("gs://vcm-ml-scratch/spencerc/2022-05-18-n2f-25-km/post-processed-data.zarr")
+POST_PROCESSED_DATA = fsspec.get_mapper("gs://vcm-ml-experiments/spencerc/2022-05-25-n2f-25-km/post-processed-data.zarr")
 SPATIAL_DIMS = ["x", "y", "tile"]
 ZONAL_DIMS = ["lat", "pressure"]
 AS_AUG_CONFIGURATIONS = ["Fine resolution (year one)", "Fine resolution (year two)", "Nudged"]

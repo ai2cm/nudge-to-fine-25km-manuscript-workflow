@@ -20,8 +20,7 @@ logging.basicConfig(level=logging.INFO)
 
 TARGET_TIMES = xr.cftime_range("2018-08", "2023-10", freq="MS", calendar="julian")
 CLIMATES = ["Minus 4 K", "Unperturbed", "Plus 4 K", "Plus 8 K"]
-# DESTINATION = fsspec.get_mapper("gs://vcm-ml-scratch/spencerc/2022-05-16-n2f-25-km/post-processed-data.zarr")
-DESTINATION = fsspec.get_mapper("gs://vcm-ml-scratch/spencerc/2022-05-18-n2f-25-km/post-processed-data.zarr")
+DESTINATION = fsspec.get_mapper("gs://vcm-ml-experiments/spencerc/2022-05-25-n2f-25-km/post-processed-data.zarr")
 
 
 def reindex_like_months(ds, times):
@@ -332,11 +331,9 @@ if __name__ == "__main__":
     result = result.chunk({"configuration": 1, "climate": 1})
     result = result.sel(climate=CLIMATES)  # Ensure climates are ordered from coldest to warmest
 
-    print(result)
-
     result.partition.initialize_store(DESTINATION)
-    # ranks = 96
-    # for i in range(ranks):
-    #     logging.info(f"Writing rank {i + 1} / {ranks}")
-    #     with dask.diagnostics.ProgressBar():
-    #         result.partition.write(DESTINATION, ranks, ["climate", "configuration", "time"], i)
+    ranks = 96
+    for i in range(ranks):
+        logging.info(f"Writing rank {i + 1} / {ranks}")
+        with dask.diagnostics.ProgressBar():
+            result.partition.write(DESTINATION, ranks, ["climate", "configuration", "time"], i)
