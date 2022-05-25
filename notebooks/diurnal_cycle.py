@@ -1,3 +1,4 @@
+import datetime
 import logging
 
 import dask.diagnostics
@@ -25,7 +26,8 @@ def compute_diurnal_cycles(
     tape,
     time_slice,
     variable,
-    compute_nudging_precip=False
+    compute_nudging_precip=False,
+    time_offset=None
 ):
     dataarrays = {}
     for climate, root in roots.items():
@@ -33,6 +35,15 @@ def compute_diurnal_cycles(
         ds = cloud.open_tape(root, tape)
         if compute_nudging_precip:
             ds = compute_nudging_precipitation_diagnostics(ds)
+        if time_offset is not None:
+            # The fine-resolution fields are offset by seven minutes and thirty
+            # seconds since the time-interval average fortran physics
+            # diagnostics are output with labels at the end of the interval.  In
+            # practice this minor offset doesn't make a material difference when
+            # computing the diurnal cycle, but we include it here to be most
+            # precise.  The precipitation rates from the other datasets do not
+            # need an offset added since they were output by the Python wrapper.
+            ds = ds.assign_coords(time=ds.time + time_offset)
         da = SECONDS_PER_DAY * ds[variable].sel(time=time_slice)
         da = da.assign_coords(configuration=configuration)
         da = da.expand_dims(["configuration"])
@@ -166,7 +177,8 @@ DATASETS = {
         },
         "tape": "gfsphysics_15min_coarse",
         "time_slice": slice("2017-08", "2018-07"),
-        "variable": "PRATEsfc"
+        "variable": "PRATEsfc",
+        "time_offset": datetime.timedelta(minutes=-7, seconds=-30)
     },
     "Fine resolution (year two)": {
         "roots": {
@@ -177,7 +189,8 @@ DATASETS = {
         },
         "tape": "gfsphysics_15min_coarse",
         "time_slice": slice("2018-08", "2019-07"),
-        "variable": "PRATEsfc"
+        "variable": "PRATEsfc",
+        "time_offset": datetime.timedelta(minutes=-7, seconds=-30)
     }
 }
 
@@ -191,7 +204,8 @@ if __name__ == "__main__":
             metadata["tape"],
             metadata["time_slice"],
             metadata["variable"],
-            metadata.get("compute_nudging_precip", False)
+            metadata.get("compute_nudging_precip", False),
+            metadata.get("time_offset", None)
         )
         dataarrays.append(ds)
     ds = xr.concat(dataarrays, dim="configuration").to_dataset()

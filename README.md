@@ -15,7 +15,7 @@ through the use of Argo workflows or locally on a virtual machine.
 
 ## Workflow
 
-The workflow for reproducing the experiments described in the paper is
+The workflow for reproducing the main experiments described in the paper is
 summarized in the directed acyclic graph below.  In all cases where "runs" are
 referenced, simulations in all four climates are completed, i.e. climates with
 sea-surface temperatures perturbed by -4 K, 0 K, +4 K, and +8 K.
@@ -107,9 +107,12 @@ of the ML-corrected runs the same radiative flux derived model is used.
 
 ### Generating figures (Google Cloud)
 
-Finally, to generate the figures and tables in the manuscript, we start by
-running a set of post-processing scripts that do some post-processing and
-combine data from all the simulations in an easy to read form.  This is done in
-the `post_process_runs` rule.  After that, the figures and tables used in the
-paper can be generated using the `create_figures` rule, which runs the
-interactive notebooks that contain the code to produce them.
+To generate the figures and tables in the manuscript, we start by running a set
+of post-processing scripts that do some post-processing and combine data from
+all the simulations in an easy to read form.  This is done in the
+`post_process_runs` rule.  After that, the figures and tables used in the paper
+can be generated using the `create_figures` rule, which runs the interactive
+notebooks that contain the code to produce them.  Note that Figure 2 of the
+manuscript depends on output from an old simulation, for which we also include
+makefile rules to reproduce, but for simplicity we do not describe those rules
+in the README.
