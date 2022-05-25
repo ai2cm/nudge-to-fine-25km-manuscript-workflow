@@ -40,7 +40,7 @@ Some important software versions used in running the simulations described in th
 - The model source code used to run these simulations comes from [this
   branch](https://github.com/ai2cm/fv3gfs-fortran/tree/physics-component-time-average-diags)
   of the fv3gfs-fortran repository.
-- The version of the fv3config used to write run directories is 0.4.0.
+- The version of fv3config used to write run directories is 0.4.0.
 - The `chgres_cube` tool used was compiled by Kai-Yuan Cheng on Gaea and is
   derived from cloning the [UFS_UTILS
   repository](https://github.com/ufs-community/UFS_UTILS) at the commit:
