@@ -223,14 +223,16 @@ create_old_fluxes_derived_model:
 # Indeed in this case we ran the ML-corrected simulation with the patched
 # maximum snow albedo in the initial conditions (unlike the nudged runs
 # associated with this particular experiment, where the maximum snow albedo was
-# not patched).
-ensemble_ml_corrected_run_unperturbed: deploy_old_ml_corrected
+# not patched).  Note this uses the version of fv3net used to run the nudged and
+# baseline simulations in this study, since it has a transmissivity model
+# capability built in.
+ensemble_ml_corrected_run_unperturbed: deploy_nudged_or_baseline
 	./workflows/legacy/scripts/run-ensemble-ml-corrected.sh \
 		ml-corrected-v1-ensemble-unperturbed \
-		$(PATCHED_RESTART_FILE_DESTINATION)/$* \
+		$(PATCHED_RESTART_FILE_DESTINATION)/unperturbed \
 		workflows/legacy/ml-corrected-runs/unperturbed.yaml \
 		$(OLD_TQ_NN_ENSEMBLE) \
-		192 \
+		1 \
 		$(OLD_RF_DERIVED)
 
 

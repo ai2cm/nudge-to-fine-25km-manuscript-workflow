@@ -1,4 +1,4 @@
-n#!/bin/bash
+#!/bin/bash
 
 set -e
 
@@ -10,7 +10,7 @@ SEGMENTS=$5
 RADIATIVE_FLUX_MODEL=$6
 
 RANDOM=$(openssl rand --hex 6)
-CONFIG=./workflows/ml-corrected-simulations/tmp-ensemble.yaml
+CONFIG=./workflows/legacy/ml-corrected-runs/tmp-ensemble.yaml
 cp $BASE_CONFIG $CONFIG
 sed -i "s#RADIATIVE_FLUX_MODEL#$RADIATIVE_FLUX_MODEL#g" $CONFIG
 
