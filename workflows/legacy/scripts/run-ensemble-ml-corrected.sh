@@ -18,7 +18,7 @@ n=0
 until [ "$n" -ge 5 ]
 do
     argo submit --from workflowtemplate/prognostic-run \
-        -p bucket=vcm-ml-scratch \
+        -p bucket=vcm-ml-experiments \
         -p project=spencerc \
         -p tag=${TAG} \
         -p config="$(< $CONFIG)" \
