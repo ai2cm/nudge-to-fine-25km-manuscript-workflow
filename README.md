@@ -18,7 +18,9 @@ notebooks that produce the figures and tables used in the manuscript.  The
 `software` directory contains submodules representing the snapshots of the
 fv3net and fv3gfs-fortran repositories used for the different runs in this
 project.  Finally, the `workflows` directory contains configuration and simple
-scripts for running simulations and training machine learning models.
+scripts for running simulations and training machine learning models.  The
+top-level `Makefile` in this repository describes how the different steps can be
+completed.
 
 ## Workflow
 
