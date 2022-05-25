@@ -1,0 +1,12 @@
+[submodule "software/fv3net-old-ml-corrected/fv3net"]
+	path = software/fv3net-old-ml-corrected/fv3net
+	url = https://github.com/ai2cm/fv3net.git
+[submodule "software/fv3net-nudged-or-baseline/fv3net"]
+	path = software/fv3net-nudged-or-baseline/fv3net
+	url = https://github.com/ai2cm/fv3net.git
+[submodule "software/fv3net-ml-corrected/fv3net"]
+	path = software/fv3net-ml-corrected/fv3net
+	url = https://github.com/ai2cm/fv3net.git
+[submodule "software/fv3gfs-fortran-fine-resolution/fv3gfs-fortran"]
+	path = software/fv3gfs-fortran-fine-resolution/fv3gfs-fortran
+	url = https://github.com/ai2cm/fv3gfs-fortran.git

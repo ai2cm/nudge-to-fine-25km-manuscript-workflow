@@ -1,0 +1,7 @@
+model: gs://vcm-ml-experiments/spencerc/2021-05-11/n2f-25km-models/all-climate-8k-fluxes-transmissivity-base
+additional_input_variables:
+    - surface_diffused_shortwave_albedo
+    - total_sky_downward_shortwave_flux_at_top_of_atmosphere
+derived_output_variables:
+    - downward_shortwave_sfc_flux_via_transmissivity
+    - net_shortwave_sfc_flux_via_transmissivity
