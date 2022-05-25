@@ -13,12 +13,12 @@ nudged runs, baseline runs, ML-model-training, ML-corrected runs, and
 post-processing/figure creation -- were run on Google Cloud, either on a cluster
 through the use of Argo workflows or locally on a virtual machine.  
 
-The `notebooks` directory contains a sequence of notebooks that produce the
-figures and tables used in the manuscript.  The `software` directory contains
-submodules representing the snapshots of the fv3net and fv3gfs-fortran
-repositories used for the different runs in this project.  Finally, the
-`workflows` directory contains configuration and simple scripts for running
-simulations and training machine learning models.
+The `notebooks` directory contains a sequence of post-processing scripts and
+notebooks that produce the figures and tables used in the manuscript.  The
+`software` directory contains submodules representing the snapshots of the
+fv3net and fv3gfs-fortran repositories used for the different runs in this
+project.  Finally, the `workflows` directory contains configuration and simple
+scripts for running simulations and training machine learning models.
 
 ## Workflow
 
