@@ -9,5 +9,5 @@ images:
   newTag: d474a7bdcedc45a2a310c90664ff313aaf11f2be
 - name: us.gcr.io/vcm-ml/prognostic_run
   newTag: d474a7bdcedc45a2a310c90664ff313aaf11f2be
-  # newTag: 9501a63562e2f16b93605de2e2b00483ec165210
+
 
