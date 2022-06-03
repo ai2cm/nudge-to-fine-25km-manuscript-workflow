@@ -7,7 +7,7 @@ DATA_CONFIG=$2
 SEED=$3
 OUTPUT=$4
 
-TRAINING_CONFIG=./workflows/ml-corrected-simulations/tmp-seed-$SEED.yml
+TRAINING_CONFIG=./workflows/ml-training/tmp-seed-$SEED.yml
 cp $BASE_TRAINING_CONFIG $TRAINING_CONFIG
 sed -i "s/^random_seed: .*$/random_seed: $SEED/" $TRAINING_CONFIG
 argo submit --from workflowtemplate/training \

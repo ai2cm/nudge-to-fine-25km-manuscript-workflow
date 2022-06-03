@@ -92,6 +92,7 @@ create_derived_radiative_flux_model: deploy_ml_corrected
 		$(FLUXES_RF_DERIVED)
 
 
+train_nudging_tendency_networks: $(addprefix train_nudging_tendency_networks_, $(SEEDS))
 train_nudging_tendency_networks_%: deploy_ml_corrected
 	./workflows/scripts/train-nn.sh \
 		workflows/ml-training/tq-nn-training-config.yaml \
