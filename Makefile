@@ -111,7 +111,7 @@ ml_corrected_run_%: deploy_ml_corrected
 		$(TQ_NN) \
 		"0 1 2 3" \
 		46 \
-		$(FLUX_RF_DERIVED)
+		$(FLUXES_RF_DERIVED)
 
 
 extend_ml_corrected_runs: deploy_ml_corrected
