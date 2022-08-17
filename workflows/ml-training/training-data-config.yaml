@@ -1,7 +1,7 @@
 mapper_config:
   function: open_zarr
   kwargs:
-    data_path: gs://vcm-ml-experiments/spencerc/2022-03-12/n2f-25km-tapered-25-snoalb-nudging-tendencies-and-fluxes.zarr
+    data_path: gs://vcm-ml-experiments/spencerc/2022-06-28/n2f-25km-tapered-25-snoalb-nudging-tendencies-and-fluxes.zarr
 function: batches_from_mapper
 kwargs:
   timesteps:

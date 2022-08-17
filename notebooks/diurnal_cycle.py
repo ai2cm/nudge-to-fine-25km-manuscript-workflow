@@ -134,12 +134,12 @@ def compute_diurnal_cycle(
 
 
 DATASETS = {
-    "ML-corrected seed 2": {
+    "ML-corrected seed 1": {
         "roots": {
-            "Minus 4 K": "gs://vcm-ml-experiments/spencerc/2022-03-29/n2f-25km-ml-corrected-v3-minus-4k-seed-2/fv3gfs_run",
-            "Unperturbed": "gs://vcm-ml-experiments/spencerc/2022-03-13/n2f-25km-ml-corrected-v3-unperturbed-seed-2/fv3gfs_run",
-            "Plus 4 K": "gs://vcm-ml-experiments/spencerc/2022-03-29/n2f-25km-ml-corrected-v3-plus-4k-seed-2/fv3gfs_run",
-            "Plus 8 K": "gs://vcm-ml-experiments/spencerc/2022-03-29/n2f-25km-ml-corrected-v3-plus-8k-seed-2/fv3gfs_run"
+            "Minus 4 K": "gs://vcm-ml-experiments/spencerc/2022-06-30/n2f-25km-ml-corrected-updated-v3-minus-4k-seed-1/fv3gfs_run",
+            "Unperturbed": "gs://vcm-ml-experiments/spencerc/2022-06-30/n2f-25km-ml-corrected-updated-v3-unperturbed-seed-1/fv3gfs_run",
+            "Plus 4 K": "gs://vcm-ml-experiments/spencerc/2022-06-30/n2f-25km-ml-corrected-updated-v3-plus-4k-seed-1/fv3gfs_run",
+            "Plus 8 K": "gs://vcm-ml-experiments/spencerc/2022-06-30/n2f-25km-ml-corrected-updated-v3-plus-8k-seed-1/fv3gfs_run"
         },
         "tape": "diags",
         "time_slice": slice("2018-11", "2023-10"),
@@ -150,7 +150,7 @@ DATASETS = {
             "Minus 4 K": "gs://vcm-ml-experiments/spencerc/2022-01-22/n2f-25km-baseline-minus-4k-snoalb/fv3gfs_run",
             "Unperturbed": "gs://vcm-ml-experiments/spencerc/2022-01-22/n2f-25km-baseline-unperturbed-snoalb/fv3gfs_run",
             "Plus 4 K": "gs://vcm-ml-experiments/spencerc/2022-01-22/n2f-25km-baseline-plus-4k-snoalb/fv3gfs_run",
-            "Plus 8 K": "gs://vcm-ml-experiments/spencerc/2022-01-22/n2f-25km-baseline-plus-8k-snoalb/fv3gfs_run",
+            "Plus 8 K": "gs://vcm-ml-experiments/spencerc/2022-07-01/n2f-25km-baseline-updated-plus-8k-snoalb/fv3gfs_run",
         },
         "tape": "diags",
         "time_slice": slice("2018-11", "2023-10"),
@@ -161,7 +161,7 @@ DATASETS = {
             "Minus 4 K": "gs://vcm-ml-experiments/spencerc/2022-01-19/n2f-25km-minus-4k-snoalb/fv3gfs_run",
             "Unperturbed": "gs://vcm-ml-experiments/spencerc/2022-01-19/n2f-25km-unperturbed-snoalb/fv3gfs_run",
             "Plus 4 K": "gs://vcm-ml-experiments/spencerc/2022-01-19/n2f-25km-plus-4k-snoalb/fv3gfs_run",
-            "Plus 8 K": "gs://vcm-ml-experiments/spencerc/2022-01-19/n2f-25km-plus-8k-snoalb/fv3gfs_run"
+            "Plus 8 K": "gs://vcm-ml-experiments/spencerc/2022-06-14/n2f-25km-updated-plus-8k-snoalb/fv3gfs_run"
         },
         "tape": "diags",
         "time_slice": slice("2018-08", "2019-07"),
@@ -173,7 +173,7 @@ DATASETS = {
             "Minus 4 K": "gs://vcm-ml-raw-flexible-retention/2021-01-04-1-year-C384-FV3GFS-simulations/minus-4K/C384-to-C48-diagnostics",
             "Unperturbed": "gs://vcm-ml-raw-flexible-retention/2021-01-04-1-year-C384-FV3GFS-simulations/unperturbed/C384-to-C48-diagnostics",
             "Plus 4 K": "gs://vcm-ml-raw-flexible-retention/2021-01-04-1-year-C384-FV3GFS-simulations/plus-4K/C384-to-C48-diagnostics",
-            "Plus 8 K": "gs://vcm-ml-raw-flexible-retention/2021-01-04-1-year-C384-FV3GFS-simulations/plus-8K/C384-to-C48-diagnostics"
+            "Plus 8 K": "gs://vcm-ml-raw-flexible-retention/2022-06-02-two-year-C384-FV3GFS-simulations/plus-8K/C384-to-C48-diagnostics"
         },
         "tape": "gfsphysics_15min_coarse",
         "time_slice": slice("2017-08", "2018-07"),
@@ -185,7 +185,7 @@ DATASETS = {
             "Minus 4 K": "gs://vcm-ml-raw-flexible-retention/2021-01-04-1-year-C384-FV3GFS-simulations/minus-4K/C384-to-C48-diagnostics",
             "Unperturbed": "gs://vcm-ml-raw-flexible-retention/2021-01-04-1-year-C384-FV3GFS-simulations/unperturbed/C384-to-C48-diagnostics",
             "Plus 4 K": "gs://vcm-ml-raw-flexible-retention/2021-01-04-1-year-C384-FV3GFS-simulations/plus-4K/C384-to-C48-diagnostics",
-            "Plus 8 K": "gs://vcm-ml-raw-flexible-retention/2021-01-04-1-year-C384-FV3GFS-simulations/plus-8K/C384-to-C48-diagnostics"
+            "Plus 8 K": "gs://vcm-ml-raw-flexible-retention/2022-06-02-two-year-C384-FV3GFS-simulations/plus-8K/C384-to-C48-diagnostics"
         },
         "tape": "gfsphysics_15min_coarse",
         "time_slice": slice("2018-08", "2019-07"),

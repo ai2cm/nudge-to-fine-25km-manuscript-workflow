@@ -2,7 +2,7 @@ data_table: default
 diag_table: /lustre/f2/dev/gfdl/Spencer.Clark/vulcan/2021-01-09-FV3GFS-training-runs/diag_table_ml_training
 experiment_name: default_experiment
 forcing: /lustre/f2/scratch/Spencer.Clark/fv3config-cache/data/base_forcing/v1.1
-initial_conditions: /lustre/f2/dev/Spencer.Clark/vulcan/2020-12-17-FV3GFS-C384-ICs/plus-4K
+initial_conditions: /lustre/f2/dev/Spencer.Clark/vulcan/2020-12-17-FV3GFS-C384-ICs/plus-8K
 namelist:
   amip_interp_nml:
     data_set: reynolds_oi

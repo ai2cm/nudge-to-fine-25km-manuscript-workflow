@@ -20,7 +20,7 @@ logging.basicConfig(level=logging.INFO)
 
 TARGET_TIMES = xr.cftime_range("2018-08", "2023-10", freq="MS", calendar="julian")
 CLIMATES = ["Minus 4 K", "Unperturbed", "Plus 4 K", "Plus 8 K"]
-DESTINATION = fsspec.get_mapper("gs://vcm-ml-experiments/spencerc/2022-05-25-n2f-25-km/post-processed-data.zarr")
+DESTINATION = fsspec.get_mapper("gs://vcm-ml-experiments/spencerc/2022-07-13-n2f-25-km/post-processed-data-five-years-updated.zarr")
 
 
 def reindex_like_months(ds, times):
@@ -133,28 +133,28 @@ class FineStore(Store):
 
 ML_CORRECTED = {
     "Minus 4 K": {
-        "ML-corrected seed 0": "gs://vcm-ml-experiments/spencerc/2022-03-29/n2f-25km-ml-corrected-v3-minus-4k-seed-0/fv3gfs_run",
-        "ML-corrected seed 1": "gs://vcm-ml-experiments/spencerc/2022-03-29/n2f-25km-ml-corrected-v3-minus-4k-seed-1/fv3gfs_run",
-        "ML-corrected seed 2": "gs://vcm-ml-experiments/spencerc/2022-03-29/n2f-25km-ml-corrected-v3-minus-4k-seed-2/fv3gfs_run",
-        "ML-corrected seed 3": "gs://vcm-ml-experiments/spencerc/2022-03-29/n2f-25km-ml-corrected-v3-minus-4k-seed-3/fv3gfs_run",
+        "ML-corrected seed 0": "gs://vcm-ml-experiments/spencerc/2022-06-30/n2f-25km-ml-corrected-updated-v3-minus-4k-seed-0/fv3gfs_run",
+        "ML-corrected seed 1": "gs://vcm-ml-experiments/spencerc/2022-06-30/n2f-25km-ml-corrected-updated-v3-minus-4k-seed-1/fv3gfs_run",
+        "ML-corrected seed 2": "gs://vcm-ml-experiments/spencerc/2022-06-30/n2f-25km-ml-corrected-updated-v3-minus-4k-seed-2/fv3gfs_run",
+        "ML-corrected seed 3": "gs://vcm-ml-experiments/spencerc/2022-06-30/n2f-25km-ml-corrected-updated-v3-minus-4k-seed-3/fv3gfs_run",
     },
     "Unperturbed": {
-        "ML-corrected seed 0": "gs://vcm-ml-experiments/spencerc/2022-03-13/n2f-25km-ml-corrected-v3-unperturbed-seed-0/fv3gfs_run",
-        "ML-corrected seed 1": "gs://vcm-ml-experiments/spencerc/2022-03-13/n2f-25km-ml-corrected-v3-unperturbed-seed-1/fv3gfs_run",
-        "ML-corrected seed 2": "gs://vcm-ml-experiments/spencerc/2022-03-13/n2f-25km-ml-corrected-v3-unperturbed-seed-2/fv3gfs_run",
-        "ML-corrected seed 3": "gs://vcm-ml-experiments/spencerc/2022-03-13/n2f-25km-ml-corrected-v3-unperturbed-seed-3/fv3gfs_run",
+        "ML-corrected seed 0": "gs://vcm-ml-experiments/spencerc/2022-06-30/n2f-25km-ml-corrected-updated-v3-unperturbed-seed-0/fv3gfs_run",
+        "ML-corrected seed 1": "gs://vcm-ml-experiments/spencerc/2022-06-30/n2f-25km-ml-corrected-updated-v3-unperturbed-seed-1/fv3gfs_run",
+        "ML-corrected seed 2": "gs://vcm-ml-experiments/spencerc/2022-06-30/n2f-25km-ml-corrected-updated-v3-unperturbed-seed-2/fv3gfs_run",
+        "ML-corrected seed 3": "gs://vcm-ml-experiments/spencerc/2022-06-30/n2f-25km-ml-corrected-updated-v3-unperturbed-seed-3/fv3gfs_run",
     },
     "Plus 4 K": {
-        "ML-corrected seed 0": "gs://vcm-ml-experiments/spencerc/2022-03-29/n2f-25km-ml-corrected-v3-plus-4k-seed-0/fv3gfs_run",
-        "ML-corrected seed 1": "gs://vcm-ml-experiments/spencerc/2022-03-29/n2f-25km-ml-corrected-v3-plus-4k-seed-1/fv3gfs_run",
-        "ML-corrected seed 2": "gs://vcm-ml-experiments/spencerc/2022-03-29/n2f-25km-ml-corrected-v3-plus-4k-seed-2/fv3gfs_run",
-        "ML-corrected seed 3": "gs://vcm-ml-experiments/spencerc/2022-03-29/n2f-25km-ml-corrected-v3-plus-4k-seed-3/fv3gfs_run",
+        "ML-corrected seed 0": "gs://vcm-ml-experiments/spencerc/2022-06-30/n2f-25km-ml-corrected-updated-v3-plus-4k-seed-0/fv3gfs_run",
+        "ML-corrected seed 1": "gs://vcm-ml-experiments/spencerc/2022-06-30/n2f-25km-ml-corrected-updated-v3-plus-4k-seed-1/fv3gfs_run",
+        "ML-corrected seed 2": "gs://vcm-ml-experiments/spencerc/2022-06-30/n2f-25km-ml-corrected-updated-v3-plus-4k-seed-2/fv3gfs_run",
+        "ML-corrected seed 3": "gs://vcm-ml-experiments/spencerc/2022-06-30/n2f-25km-ml-corrected-updated-v3-plus-4k-seed-3/fv3gfs_run",
     },
     "Plus 8 K": {
-        "ML-corrected seed 0": "gs://vcm-ml-experiments/spencerc/2022-03-29/n2f-25km-ml-corrected-v3-plus-8k-seed-0/fv3gfs_run",
-        "ML-corrected seed 1": "gs://vcm-ml-experiments/spencerc/2022-03-29/n2f-25km-ml-corrected-v3-plus-8k-seed-1/fv3gfs_run",
-        "ML-corrected seed 2": "gs://vcm-ml-experiments/spencerc/2022-03-29/n2f-25km-ml-corrected-v3-plus-8k-seed-2/fv3gfs_run",
-        "ML-corrected seed 3": "gs://vcm-ml-experiments/spencerc/2022-03-29/n2f-25km-ml-corrected-v3-plus-8k-seed-3/fv3gfs_run",
+        "ML-corrected seed 0": "gs://vcm-ml-experiments/spencerc/2022-06-30/n2f-25km-ml-corrected-updated-v3-plus-8k-seed-0/fv3gfs_run",
+        "ML-corrected seed 1": "gs://vcm-ml-experiments/spencerc/2022-06-30/n2f-25km-ml-corrected-updated-v3-plus-8k-seed-1/fv3gfs_run",
+        "ML-corrected seed 2": "gs://vcm-ml-experiments/spencerc/2022-06-30/n2f-25km-ml-corrected-updated-v3-plus-8k-seed-2/fv3gfs_run",
+        "ML-corrected seed 3": "gs://vcm-ml-experiments/spencerc/2022-06-30/n2f-25km-ml-corrected-updated-v3-plus-8k-seed-3/fv3gfs_run",
     },
 }
 
@@ -163,7 +163,7 @@ BASELINE = {
     "Minus 4 K": "gs://vcm-ml-experiments/spencerc/2022-01-22/n2f-25km-baseline-minus-4k-snoalb/fv3gfs_run",
     "Unperturbed": "gs://vcm-ml-experiments/spencerc/2022-01-22/n2f-25km-baseline-unperturbed-snoalb/fv3gfs_run",
     "Plus 4 K": "gs://vcm-ml-experiments/spencerc/2022-01-22/n2f-25km-baseline-plus-4k-snoalb/fv3gfs_run",
-    "Plus 8 K": "gs://vcm-ml-experiments/spencerc/2022-01-22/n2f-25km-baseline-plus-8k-snoalb/fv3gfs_run",
+    "Plus 8 K": "gs://vcm-ml-experiments/spencerc/2022-07-01/n2f-25km-baseline-updated-plus-8k-snoalb/fv3gfs_run",
 }
 
 
@@ -201,7 +201,7 @@ NUDGED = {
     "Minus 4 K": "gs://vcm-ml-experiments/spencerc/2022-01-19/n2f-25km-minus-4k-snoalb/fv3gfs_run",
     "Unperturbed": "gs://vcm-ml-experiments/spencerc/2022-01-19/n2f-25km-unperturbed-snoalb/fv3gfs_run",
     "Plus 4 K": "gs://vcm-ml-experiments/spencerc/2022-01-19/n2f-25km-plus-4k-snoalb/fv3gfs_run",
-    "Plus 8 K": "gs://vcm-ml-experiments/spencerc/2022-01-19/n2f-25km-plus-8k-snoalb/fv3gfs_run"
+    "Plus 8 K": "gs://vcm-ml-experiments/spencerc/2022-06-14/n2f-25km-updated-plus-8k-snoalb/fv3gfs_run"
 }
 
 
@@ -241,7 +241,7 @@ FINE_RES = {
     "Minus 4 K": "gs://vcm-ml-raw-flexible-retention/2021-01-04-1-year-C384-FV3GFS-simulations/minus-4K/C384-to-C48-diagnostics",
     "Unperturbed": "gs://vcm-ml-raw-flexible-retention/2021-01-04-1-year-C384-FV3GFS-simulations/unperturbed/C384-to-C48-diagnostics",
     "Plus 4 K": "gs://vcm-ml-raw-flexible-retention/2021-01-04-1-year-C384-FV3GFS-simulations/plus-4K/C384-to-C48-diagnostics",
-    "Plus 8 K": "gs://vcm-ml-raw-flexible-retention/2021-01-04-1-year-C384-FV3GFS-simulations/plus-8K/C384-to-C48-diagnostics"
+    "Plus 8 K": "gs://vcm-ml-raw-flexible-retention/2022-06-02-two-year-C384-FV3GFS-simulations/plus-8K/C384-to-C48-diagnostics"
 }
 
 

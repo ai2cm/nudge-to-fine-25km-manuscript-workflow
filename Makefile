@@ -7,29 +7,37 @@ endef
 
 EXPERIMENTS=gs://vcm-ml-experiments/spencerc
 CLIMATES = minus-4K unperturbed plus-4K plus-8K
+
 SEEDS = 0 1 2 3
 
 # Preparation steps
-C384_SFC_DATA_ROOT=$(EXPERIMENTS)/2022-01-19-C384-sfc_data-initial-conditions
+C384_SFC_DATA_ROOT=$(EXPERIMENTS)/2022-06-14-C384-sfc_data-initial-conditions
 C384_AREA=$(C384_SFC_DATA_ROOT)/area/area
-PATCHED_RESTART_FILE_DESTINATION=$(EXPERIMENTS)/2022-01-19-C48-snoalb-patched-restart-files
-C48_REFERENCE_ROOT=gs://vcm-ml-raw-flexible-retention/2021-01-04-1-year-C384-FV3GFS-simulations
+PATCHED_RESTART_FILE_DESTINATION=$(EXPERIMENTS)/2022-06-14-C48-snoalb-patched-restart-files
+
+C48_REFERENCE_ROOT_minus-4K=gs://vcm-ml-raw-flexible-retention/2021-01-04-1-year-C384-FV3GFS-simulations
+C48_REFERENCE_ROOT_unperturbed=gs://vcm-ml-raw-flexible-retention/2021-01-04-1-year-C384-FV3GFS-simulations
+C48_REFERENCE_ROOT_plus-4K=gs://vcm-ml-raw-flexible-retention/2021-01-04-1-year-C384-FV3GFS-simulations
+C48_REFERENCE_ROOT_plus-8K=gs://vcm-ml-raw-flexible-retention/2022-06-02-two-year-C384-FV3GFS-simulations
+
 NUDGED_RUN_START_DATE=20170801.010000
 PROGNOSTIC_RUN_START_DATE=20180801.000000
 
 # Nudged runs
-PRESCRIBER_REFERENCE_ROOT=gs://vcm-ml-intermediate/2021-04-30-nudge-to-25-km-prescriber-datasets
+PRESCRIBER_REFERENCE_ROOT_minus-4K=gs://vcm-ml-intermediate/2021-04-30-nudge-to-25-km-prescriber-datasets
+PRESCRIBER_REFERENCE_ROOT_unperturbed=gs://vcm-ml-intermediate/2021-04-30-nudge-to-25-km-prescriber-datasets
+PRESCRIBER_REFERENCE_ROOT_plus-4K=gs://vcm-ml-intermediate/2021-04-30-nudge-to-25-km-prescriber-datasets
+PRESCRIBER_REFERENCE_ROOT_plus-8K=gs://vcm-ml-intermediate/2022-06-14-nudge-to-25-km-prescriber-datasets
 
 # ML training
-TRAINING_DATA=gs://vcm-ml-experiments/spencerc/2022-03-12/n2f-25km-tapered-25-snoalb-nudging-tendencies-and-fluxes.zarr
-TRAIN_ROOT=gs://vcm-ml-experiments/spencerc/2022-03-12-nudge-to-25-km-ml-models
+TRAINING_DATA=gs://vcm-ml-experiments/spencerc/2022-06-28/n2f-25km-tapered-25-snoalb-nudging-tendencies-and-fluxes.zarr
+TRAIN_ROOT=gs://vcm-ml-experiments/spencerc/2022-06-20-nudge-to-25-km-ml-models
 FLUXES_RF_BASE=$(TRAIN_ROOT)/fluxes-rf-transmissivity-snoalb
 FLUXES_RF_DERIVED=$(TRAIN_ROOT)/fluxes-rf-transmissivity-snoalb-derived
 TQ_NN=$(TRAIN_ROOT)/tq-nn-snoalb-tapered-clipped-25
 
 # Figures
-FIGURES = figure-01 figure-02 figure-03 figure-04 figure-05 figure-06 figure-07 figure-08 figure-09 figure-10 figure-11 figure-12 figure-13 table-02 table-climate-change
-
+FIGURES = figure-01 figure-02 figure-03 figure-04 figure-05 figure-06 figure-07 figure-08 figure-09 figure-10 figure-11 figure-12 figure-13 figure-S01 figure-S02 table-02 table-climate-change
 
 create_environment:
 	make -C software/fv3net-ml-corrected/fv3net update_submodules && \
@@ -44,7 +52,7 @@ initial_conditions_%:
 	python workflows/scripts/patch_snoalb.py \
 		$(C384_SFC_DATA_ROOT)/$*/sfc_data \
 		$(C384_AREA) \
-		$(C48_REFERENCE_ROOT)/$*/C384-to-C48-restart-files \
+		$(C48_REFERENCE_ROOT_$*)/$*/C384-to-C48-restart-files \
 		$(PATCHED_RESTART_FILE_DESTINATION)/$* \
 		$(NUDGED_RUN_START_DATE) $(PROGNOSTIC_RUN_START_DATE)
 
@@ -53,23 +61,35 @@ initial_conditions_%:
 prescriber_reference: $(addprefix generate_prescriber_reference_, $(CLIMATES))
 prescriber_reference_%:
 	python workflows/scripts/generate_prescriber_reference_dataset.py \
-		$(C48_REFERENCE_ROOT)/$*/C384-to-C48-diagnostics/gfsphysics_15min_coarse.zarr \
-		$(PRESCRIBER_REFERENCE_ROOT)/$*/prescriber_reference.zarr
+		$(C48_REFERENCE_ROOT_$*)/$*/C384-to-C48-diagnostics/gfsphysics_15min_coarse.zarr \
+		$(PRESCRIBER_REFERENCE_ROOT_$*)/$*/prescriber_reference.zarr
 
 
+NUDGED_RUN_NAME_minus-4K=minus-4k-snoalb
+NUDGED_RUN_NAME_unperturbed=unperturbed-snoalb
+NUDGED_RUN_NAME_plus-4K=plus-4k-snoalb
+NUDGED_RUN_NAME_plus-8K=updated-plus-8k-snoalb
+
+NUDGED_RUN_CONFIG_minus-4K=workflows/nudged-runs/minus-4k.yaml
+NUDGED_RUN_CONFIG_unperturbed=workflows/nudged-runs/unperturbed.yaml
+NUDGED_RUN_CONFIG_plus-4K=workflows/nudged-runs/plus-4k.yaml
+NUDGED_RUN_CONFIG_plus-8K=workflows/nudged-runs/updated-plus-8k.yaml
 nudged_runs: $(addprefix nudged_run_, $(CLIMATES))
 nudged_run_%: deploy_nudged_or_baseline
 	workflows/scripts/run-nudged.sh \
-		$(call lower,$*)-snoalb \
-		$(C48_REFERENCE_ROOT)/$*/C384-to-C48-restart-files \
-		workflows/nudged-runs/$(call lower,$*).yaml
+		$(NUDGED_RUN_NAME_$*) \
+		$(C48_REFERENCE_ROOT_$*)/$*/C384-to-C48-restart-files \
+		$(NUDGED_RUN_CONFIG_$*)
 
 
-# Baseline runs
+BASELINE_RUN_NAME_minus-4K=minus-4k-snoalb
+BASELINE_RUN_NAME_unperturbed=unperturbed-snoalb
+BASELINE_RUN_NAME_plus-4K=plus-4k-snoalb
+BASELINE_RUN_NAME_plus-8K=updated-plus-8k-snoalb
 baseline_runs: $(addprefix baseline_run_, $(CLIMATES))
 baseline_run_%: deploy_nudged_or_baseline
 	workflows/scripts/run-baseline.sh \
-		$(call lower,$*)-snoalb \
+		$(BASELINE_RUN_NAME_$*) \
 		$(PATCHED_RESTART_FILE_DESTINATION)/$* \
 		workflows/baseline-runs/$(call lower,$*).yaml
 
@@ -105,7 +125,7 @@ train_nudging_tendency_networks_%: deploy_ml_corrected
 ml_corrected_runs: $(addprefix ml_corrected_run_, $(CLIMATES))
 ml_corrected_run_%: deploy_ml_corrected
 	./workflows/scripts/run-ml-corrected.sh \
-		ml-corrected-v3-$(call lower,$*) \
+		ml-corrected-updated-v3-$(call lower,$*) \
 		$(PATCHED_RESTART_FILE_DESTINATION)/$* \
 		workflows/ml-corrected-runs/$(call lower,$*).yaml \
 		$(TQ_NN) \
@@ -115,15 +135,10 @@ ml_corrected_run_%: deploy_ml_corrected
 
 
 extend_ml_corrected_runs: deploy_ml_corrected
-	./workflows/scripts/restart.sh gs://vcm-ml-experiments/spencerc/2022-03-29/n2f-25km-ml-corrected-v3-minus-4k-seed-2/fv3gfs_run 146
-	./workflows/scripts/restart.sh gs://vcm-ml-experiments/spencerc/2022-03-13/n2f-25km-ml-corrected-v3-unperturbed-seed-2/fv3gfs_run 146
-	./workflows/scripts/restart.sh gs://vcm-ml-experiments/spencerc/2022-03-29/n2f-25km-ml-corrected-v3-plus-4k-seed-2/fv3gfs_run 146
-	./workflows/scripts/restart.sh gs://vcm-ml-experiments/spencerc/2022-03-29/n2f-25km-ml-corrected-v3-plus-8k-seed-2/fv3gfs_run 146
-
-	./workflows/scripts/restart.sh gs://vcm-ml-experiments/spencerc/2022-03-29/n2f-25km-ml-corrected-v3-minus-4k-seed-3/fv3gfs_run 146
-	./workflows/scripts/restart.sh gs://vcm-ml-experiments/spencerc/2022-03-13/n2f-25km-ml-corrected-v3-unperturbed-seed-3/fv3gfs_run 146
-	./workflows/scripts/restart.sh gs://vcm-ml-experiments/spencerc/2022-03-29/n2f-25km-ml-corrected-v3-plus-4k-seed-3/fv3gfs_run 146
-	./workflows/scripts/restart.sh gs://vcm-ml-experiments/spencerc/2022-03-29/n2f-25km-ml-corrected-v3-plus-8k-seed-3/fv3gfs_run 146
+	./workflows/scripts/restart.sh gs://vcm-ml-experiments/spencerc/2022-06-30/n2f-25km-ml-corrected-updated-v3-minus-4k-seed-1/fv3gfs_run 146
+	./workflows/scripts/restart.sh gs://vcm-ml-experiments/spencerc/2022-06-30/n2f-25km-ml-corrected-updated-v3-unperturbed-seed-1/fv3gfs_run 146
+	./workflows/scripts/restart.sh gs://vcm-ml-experiments/spencerc/2022-06-30/n2f-25km-ml-corrected-updated-v3-plus-4k-seed-1/fv3gfs_run 146
+	./workflows/scripts/restart.sh gs://vcm-ml-experiments/spencerc/2022-06-30/n2f-25km-ml-corrected-updated-v3-plus-8k-seed-1/fv3gfs_run 146
 
 
 # Post-processing and figure creation

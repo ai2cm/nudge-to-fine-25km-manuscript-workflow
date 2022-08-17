@@ -1,6 +1,6 @@
 base_version: v0.5
 initial_conditions:
-  base_url: gs://vcm-ml-experiments/spencerc/2022-01-19-C48-snoalb-patched-restart-files/plus-4K
+  base_url: gs://vcm-ml-experiments/spencerc/2022-06-14-C48-snoalb-patched-restart-files/plus-4K
   timestep: "20180801.000000"
 prephysics:
   - diagnostic_ml: false
