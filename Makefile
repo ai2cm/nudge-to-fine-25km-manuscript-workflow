@@ -254,3 +254,74 @@ ensemble_ml_corrected_run_unperturbed: deploy_nudged_or_baseline
 
 deploy_old_ml_corrected: kustomize
 	./kustomize build software/fv3net-old-ml-corrected | kubectl apply -f -
+
+
+# Code for sensitivity study to neural network hyperparameters, i.e.
+# training new models and running new ML-corrected simulations.
+sensitivity_training_data:
+	python workflows/sensitivity-experiments/save_training_batches.py
+	python workflows/sensitivity-experiments/save_validation_batches.py
+
+
+TRAIN_ROOT_SENSITIVITY=gs://vcm-ml-experiments/spencerc/2022-07-08-trained-models
+TQ_NN_CLR=$(TRAIN_ROOT_SENSITIVITY)/tq-nn-clr-clipped-25
+train_nudging_tendency_networks_clr: $(addprefix train_nudging_tendency_networks_clr_seed_, $(SEEDS))
+train_nudging_tendency_networks_clr_seed_%: deploy_fv3net_2022_07_08
+  ./workflows/sensitivity-experiments/train-nn.sh \
+    workflows/sensitivity-experiments/tq-nn-untapered-larger-capacity.yaml \
+    workflows/sensitivity-experiments/training-data-config-netcdf.yaml  \
+    workflows/sensitivity-experiments/validation-data-config-netcdf.yaml  \
+    $* \
+    $(TQ_NN_CLR)
+
+
+FLUXES_RF_SENSITIVITY=$(TRAIN_ROOT_SENSITIVITY)/fluxes-rf-base
+train_fluxes_rf_sensitivity: deploy_fv3net_2022_07_08
+  ./workflows/sensitivity-experiments/train-rf.sh \
+    workflows/sensitivity-experiments/fluxes-rf-base.yaml \
+    workflows/sensitivity-experiments/training-data-config-netcdf.yaml  \
+    workflows/sensitivity-experiments/validation-data-config-netcdf.yaml  \
+    $(FLUXES_RF_SENSITIVITY)
+
+
+FLUXES_RF_DERIVED_SENSITIVITY=$(TRAIN_ROOT_SENSITIVITY)/fluxes-rf-derived
+create_fluxes_derived_model_sensitivity:
+  ./workflows/scripts/create-derived-model.sh $(abspath workflows/sensitivity-experiments/fluxes-rf-derived.yaml) $(FLUXES_RF_SENSITIVITY)
+
+
+ml_corrected_sensitivity_runs_v5: $(addprefix ml_corrected_sensitivity_run_v5_, $(CLIMATES))
+ml_corrected_sensitivity_run_v5_%: deploy_fv3net_2022_07_08_ml_corrected
+	./workflows/scripts/run-ml-corrected.sh \
+		ml-corrected-updated-v5-$(call lower,$*) \
+		$(PATCHED_RESTART_FILE_DESTINATION)/$* \
+		workflows/sensitivity-experiments/$(call lower,$*).yaml \
+		$(TQ_NN_CLR) \
+		"0 1 2 3" \
+		46 \
+		$(FLUXES_RF_DERIVED_SENSITIVITY)
+
+
+restart_ml_corrected_sensitivity_runs_seed_3: deploy_fv3net_2022_07_08_ml_corrected
+  ./workflows/scripts/restart.sh gs://vcm-ml-experiments/spencerc/2022-08-04/n2f-25km-ml-corrected-updated-v5-minus-4k-seed-3/fv3gfs_run 146
+  ./workflows/scripts/restart.sh gs://vcm-ml-experiments/spencerc/2022-08-04/n2f-25km-ml-corrected-updated-v5-unperturbed-seed-3/fv3gfs_run 146
+  ./workflows/scripts/restart.sh gs://vcm-ml-experiments/spencerc/2022-08-04/n2f-25km-ml-corrected-updated-v5-plus-4k-seed-3/fv3gfs_run 146
+  ./workflows/scripts/restart.sh gs://vcm-ml-experiments/spencerc/2022-08-04/n2f-25km-ml-corrected-updated-v5-plus-8k-seed-3/fv3gfs_run 146
+
+
+# Requires fv3net-2022-07-08
+sensitivity_metrics:
+	python ./workflows/sensitivity-experiments/post_processing.py
+	python ./workflows/sensitivity-experiments/metrics.py
+	python ./notebooks/offline_r2_capacity.py
+
+
+TRAIN_ROOT_SENSITIVITY_2=gs://vcm-ml-experiments/spencerc/2022-08-12-trained-models
+TQ_NN_CLR_TAPERED=$(TRAIN_ROOT_SENSITIVITY_2)/tq-nn-clr-clipped-tapered-25
+train_nudging_tendency_networks_clr_tapered: $(addprefix train_nudging_tendency_networks_clr_tapered_seed_, $(SEEDS))
+train_nudging_tendency_networks_clr_tapered_seed_%: deploy_fv3net_2022_07_08
+  ./workflows/sensitivity-experiments/train-nn.sh \
+    workflows/sensitivity-experiments/tq-nn-tapered-larger-capacity.yaml \
+    workflows/sensitivity-experiments/training-data-config-netcdf.yaml  \
+    workflows/sensitivity-experiments/validation-data-config-netcdf.yaml  \
+    $* \
+    $(TQ_NN_CLR_TAPERED)
