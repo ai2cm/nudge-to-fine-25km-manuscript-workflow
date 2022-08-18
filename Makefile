@@ -258,6 +258,14 @@ deploy_old_ml_corrected: kustomize
 
 # Code for sensitivity study to neural network hyperparameters, i.e.
 # training new models and running new ML-corrected simulations.
+deploy_fv3net_2022_07_08: kustomize
+	./kustomize build workflows/sensitivity-experiments/fv3net-2022-07-08 | kubectl apply -f -
+
+
+deploy_fv3net_2022_07_08_ml_corrected: kustomize
+	./kustomize build workflows/sensitivity-experiments/fv3net-2022-07-08-ml-corrected | kubectl apply -f -
+
+
 sensitivity_training_data:
 	python workflows/sensitivity-experiments/save_training_batches.py
 	python workflows/sensitivity-experiments/save_validation_batches.py
