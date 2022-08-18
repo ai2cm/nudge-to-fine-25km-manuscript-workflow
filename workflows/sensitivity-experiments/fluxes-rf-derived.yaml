@@ -1,0 +1,7 @@
+model: gs://vcm-ml-experiments/spencerc/2022-07-08-trained-models/fluxes-rf-base
+additional_input_variables:
+    - shortwave_transmissivity_of_atmospheric_column
+    - total_sky_downward_shortwave_flux_at_top_of_atmosphere
+derived_output_variables:
+    - downward_shortwave_sfc_flux_via_transmissivity
+    - net_shortwave_sfc_flux_via_transmissivity

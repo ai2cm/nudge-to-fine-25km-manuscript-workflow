@@ -10,16 +10,16 @@ import vcm.catalog
 FONTSIZE = 8
 
 
-def configure_style(legend_fontsize=FONTSIZE):
+def configure_style(fontsize=FONTSIZE, legend_fontsize=FONTSIZE):
     proplot.config.use_style("default")
     proplot.rc["legend.facecolor"] = "white"  # Needed to prevent proplot errors
-    proplot.rc["font.size"] = FONTSIZE
-    proplot.rc["axes.titlesize"] = FONTSIZE
-    proplot.rc["axes.labelsize"] = FONTSIZE
-    proplot.rc["xtick.labelsize"] = FONTSIZE
-    proplot.rc["ytick.labelsize"] = FONTSIZE
+    proplot.rc["font.size"] = fontsize
+    proplot.rc["axes.titlesize"] = fontsize
+    proplot.rc["axes.labelsize"] = fontsize
+    proplot.rc["xtick.labelsize"] = fontsize
+    proplot.rc["ytick.labelsize"] = fontsize
     proplot.rc["legend.fontsize"] = legend_fontsize
-    proplot.rc["figure.titlesize"] = FONTSIZE
+    proplot.rc["figure.titlesize"] = fontsize
 
 
 def get_legend(ax):

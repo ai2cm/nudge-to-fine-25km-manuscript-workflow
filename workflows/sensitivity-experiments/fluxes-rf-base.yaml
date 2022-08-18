@@ -1,0 +1,15 @@
+random_seed: 0 
+model_type: sklearn_random_forest
+hyperparameters:
+  max_depth: 13
+  n_estimators: 1
+input_variables:
+  - surface_diffused_shortwave_albedo
+  - cos_zenith_angle
+  - land_sea_mask
+  - surface_geopotential
+  - air_temperature
+  - specific_humidity
+output_variables:
+  - shortwave_transmissivity_of_atmospheric_column
+  - override_for_time_adjusted_total_sky_downward_longwave_flux_at_surface

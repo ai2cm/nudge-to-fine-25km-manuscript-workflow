@@ -6,6 +6,7 @@ import dask.diagnostics
 import fsspec
 import numpy as np
 import pandas as pd
+import vcm
 import xarray as xr
 import xpartition
 
@@ -22,7 +23,7 @@ NUDGED = {
     "Minus 4 K": "gs://vcm-ml-experiments/spencerc/2022-01-19/n2f-25km-minus-4k-snoalb/fv3gfs_run",
     "Unperturbed": "gs://vcm-ml-experiments/spencerc/2022-01-19/n2f-25km-unperturbed-snoalb/fv3gfs_run",
     "Plus 4 K": "gs://vcm-ml-experiments/spencerc/2022-01-19/n2f-25km-plus-4k-snoalb/fv3gfs_run",
-    "Plus 8 K": "gs://vcm-ml-experiments/spencerc/2022-01-19/n2f-25km-plus-8k-snoalb/fv3gfs_run",
+    "Plus 8 K": "gs://vcm-ml-experiments/spencerc/2022-06-14/n2f-25km-updated-plus-8k-snoalb/fv3gfs_run",
 }
 
 
@@ -30,7 +31,7 @@ FINE_RES = {
     "Minus 4 K": "gs://vcm-ml-raw-flexible-retention/2021-01-04-1-year-C384-FV3GFS-simulations/minus-4K/C384-to-C48-diagnostics",
     "Unperturbed": "gs://vcm-ml-raw-flexible-retention/2021-01-04-1-year-C384-FV3GFS-simulations/unperturbed/C384-to-C48-diagnostics",
     "Plus 4 K": "gs://vcm-ml-raw-flexible-retention/2021-01-04-1-year-C384-FV3GFS-simulations/plus-4K/C384-to-C48-diagnostics",
-    "Plus 8 K": "gs://vcm-ml-raw-flexible-retention/2021-01-04-1-year-C384-FV3GFS-simulations/plus-8K/C384-to-C48-diagnostics",
+    "Plus 8 K": "gs://vcm-ml-raw-flexible-retention/2022-06-02-two-year-C384-FV3GFS-simulations/plus-8K/C384-to-C48-diagnostics",
 }
 
 
@@ -38,6 +39,7 @@ STATE_VARIABLES = [
     "air_temperature",
     "specific_humidity",
     "pressure_thickness_of_atmospheric_layer",
+    "vertical_thickness_of_atmospheric_layer",
     "latitude",
     "longitude",
     "surface_geopotential",
@@ -130,6 +132,22 @@ def nudging_tendency_scale_factor(z, cutoff=25, rate=5):
     return xr.concat([scaled, unscaled], dim="z")
 
 
+def relative_humidity(
+    specific_humidity: xr.DataArray,
+    temperature: xr.DataArray,
+    pressure_thickness: xr.DataArray,
+    vertical_thickness: xr.DataArray
+) -> xr.DataArray:
+    density = vcm.density(pressure_thickness, vertical_thickness)
+    rh = vcm.relative_humidity(specific_humidity, temperature, density)
+    return rh.rename("relative_humidity").assign_attrs(
+        {
+            "long_name": "relative humidity",
+            "units": "dimensionless"
+        }
+    )
+
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     parser = argparse.ArgumentParser()
@@ -149,6 +167,14 @@ if __name__ == "__main__":
     ds = ds.rename(RENAME)
     scale_factor = nudging_tendency_scale_factor(ds.z)
     ds = ds.assign(dQ1=scale_factor * ds.dQ1, dQ2=scale_factor * ds.dQ2)
+    rh = relative_humidity(
+        ds.specific_humidity,
+        ds.air_temperature,
+        ds.pressure_thickness_of_atmospheric_layer,
+        ds.vertical_thickness_of_atmospheric_layer
+    )
+    ds = ds.drop("vertical_thickness_of_atmospheric_layer")
+    ds = ds.assign(relative_humidity=rh)
 
     RANKS = 50
     output_mapper = fsspec.get_mapper(destination)

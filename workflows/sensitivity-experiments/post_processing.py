@@ -20,7 +20,7 @@ logging.basicConfig(level=logging.INFO)
 
 TARGET_TIMES = xr.cftime_range("2018-08", "2023-10", freq="MS", calendar="julian")
 CLIMATES = ["Minus 4 K", "Unperturbed", "Plus 4 K", "Plus 8 K"]
-DESTINATION = fsspec.get_mapper("gs://vcm-ml-experiments/spencerc/2022-07-13-n2f-25-km/post-processed-data-five-years-updated.zarr")
+DESTINATION = fsspec.get_mapper("gs://vcm-ml-experiments/spencerc/2022-08-15-n2f-25-km/post-processed-data-v5.zarr")
 
 
 def reindex_like_months(ds, times):
@@ -133,28 +133,28 @@ class FineStore(Store):
 
 ML_CORRECTED = {
     "Minus 4 K": {
-        "ML-corrected seed 0": "gs://vcm-ml-experiments/spencerc/2022-06-30/n2f-25km-ml-corrected-updated-v3-minus-4k-seed-0/fv3gfs_run",
-        "ML-corrected seed 1": "gs://vcm-ml-experiments/spencerc/2022-06-30/n2f-25km-ml-corrected-updated-v3-minus-4k-seed-1/fv3gfs_run",
-        "ML-corrected seed 2": "gs://vcm-ml-experiments/spencerc/2022-06-30/n2f-25km-ml-corrected-updated-v3-minus-4k-seed-2/fv3gfs_run",
-        "ML-corrected seed 3": "gs://vcm-ml-experiments/spencerc/2022-06-30/n2f-25km-ml-corrected-updated-v3-minus-4k-seed-3/fv3gfs_run",
+        "ML-corrected seed 0": "gs://vcm-ml-experiments/spencerc/2022-08-04/n2f-25km-ml-corrected-updated-v5-minus-4k-seed-0/fv3gfs_run",
+        "ML-corrected seed 1": "gs://vcm-ml-experiments/spencerc/2022-08-04/n2f-25km-ml-corrected-updated-v5-minus-4k-seed-1/fv3gfs_run",
+        "ML-corrected seed 2": "gs://vcm-ml-experiments/spencerc/2022-08-04/n2f-25km-ml-corrected-updated-v5-minus-4k-seed-2/fv3gfs_run",
+        "ML-corrected seed 3": "gs://vcm-ml-experiments/spencerc/2022-08-04/n2f-25km-ml-corrected-updated-v5-minus-4k-seed-3/fv3gfs_run",
     },
     "Unperturbed": {
-        "ML-corrected seed 0": "gs://vcm-ml-experiments/spencerc/2022-06-30/n2f-25km-ml-corrected-updated-v3-unperturbed-seed-0/fv3gfs_run",
-        "ML-corrected seed 1": "gs://vcm-ml-experiments/spencerc/2022-06-30/n2f-25km-ml-corrected-updated-v3-unperturbed-seed-1/fv3gfs_run",
-        "ML-corrected seed 2": "gs://vcm-ml-experiments/spencerc/2022-06-30/n2f-25km-ml-corrected-updated-v3-unperturbed-seed-2/fv3gfs_run",
-        "ML-corrected seed 3": "gs://vcm-ml-experiments/spencerc/2022-06-30/n2f-25km-ml-corrected-updated-v3-unperturbed-seed-3/fv3gfs_run",
+        "ML-corrected seed 0": "gs://vcm-ml-experiments/spencerc/2022-08-04/n2f-25km-ml-corrected-updated-v5-unperturbed-seed-0/fv3gfs_run",
+        "ML-corrected seed 1": "gs://vcm-ml-experiments/spencerc/2022-08-04/n2f-25km-ml-corrected-updated-v5-unperturbed-seed-1/fv3gfs_run",
+        "ML-corrected seed 2": "gs://vcm-ml-experiments/spencerc/2022-08-04/n2f-25km-ml-corrected-updated-v5-unperturbed-seed-2/fv3gfs_run",
+        "ML-corrected seed 3": "gs://vcm-ml-experiments/spencerc/2022-08-04/n2f-25km-ml-corrected-updated-v5-unperturbed-seed-3/fv3gfs_run",
     },
     "Plus 4 K": {
-        "ML-corrected seed 0": "gs://vcm-ml-experiments/spencerc/2022-06-30/n2f-25km-ml-corrected-updated-v3-plus-4k-seed-0/fv3gfs_run",
-        "ML-corrected seed 1": "gs://vcm-ml-experiments/spencerc/2022-06-30/n2f-25km-ml-corrected-updated-v3-plus-4k-seed-1/fv3gfs_run",
-        "ML-corrected seed 2": "gs://vcm-ml-experiments/spencerc/2022-06-30/n2f-25km-ml-corrected-updated-v3-plus-4k-seed-2/fv3gfs_run",
-        "ML-corrected seed 3": "gs://vcm-ml-experiments/spencerc/2022-06-30/n2f-25km-ml-corrected-updated-v3-plus-4k-seed-3/fv3gfs_run",
+        "ML-corrected seed 0": "gs://vcm-ml-experiments/spencerc/2022-08-04/n2f-25km-ml-corrected-updated-v5-plus-4k-seed-0/fv3gfs_run",
+        "ML-corrected seed 1": "gs://vcm-ml-experiments/spencerc/2022-08-04/n2f-25km-ml-corrected-updated-v5-plus-4k-seed-1/fv3gfs_run",
+        "ML-corrected seed 2": "gs://vcm-ml-experiments/spencerc/2022-08-04/n2f-25km-ml-corrected-updated-v5-plus-4k-seed-2/fv3gfs_run",
+        "ML-corrected seed 3": "gs://vcm-ml-experiments/spencerc/2022-08-04/n2f-25km-ml-corrected-updated-v5-plus-4k-seed-3/fv3gfs_run",
     },
     "Plus 8 K": {
-        "ML-corrected seed 0": "gs://vcm-ml-experiments/spencerc/2022-06-30/n2f-25km-ml-corrected-updated-v3-plus-8k-seed-0/fv3gfs_run",
-        "ML-corrected seed 1": "gs://vcm-ml-experiments/spencerc/2022-06-30/n2f-25km-ml-corrected-updated-v3-plus-8k-seed-1/fv3gfs_run",
-        "ML-corrected seed 2": "gs://vcm-ml-experiments/spencerc/2022-06-30/n2f-25km-ml-corrected-updated-v3-plus-8k-seed-2/fv3gfs_run",
-        "ML-corrected seed 3": "gs://vcm-ml-experiments/spencerc/2022-06-30/n2f-25km-ml-corrected-updated-v3-plus-8k-seed-3/fv3gfs_run",
+        "ML-corrected seed 0": "gs://vcm-ml-experiments/spencerc/2022-08-04/n2f-25km-ml-corrected-updated-v5-plus-8k-seed-0/fv3gfs_run",
+        "ML-corrected seed 1": "gs://vcm-ml-experiments/spencerc/2022-08-04/n2f-25km-ml-corrected-updated-v5-plus-8k-seed-1/fv3gfs_run",
+        "ML-corrected seed 2": "gs://vcm-ml-experiments/spencerc/2022-08-04/n2f-25km-ml-corrected-updated-v5-plus-8k-seed-2/fv3gfs_run",
+        "ML-corrected seed 3": "gs://vcm-ml-experiments/spencerc/2022-08-04/n2f-25km-ml-corrected-updated-v5-plus-8k-seed-3/fv3gfs_run",
     },
 }
 
@@ -288,47 +288,9 @@ if __name__ == "__main__":
                 url = os.path.join(root, f"{tape}.zarr")
                 store = CoarseStore(url, configuration, climate, **kwargs)
                 stores.append(store)
-                
-    for climate in BASELINE:
-        root = BASELINE[climate]
-        for tape, kwargs in TAPES.items():
-            url = os.path.join(root, f"{tape}.zarr")
-            store = CoarseStore(url, "Baseline", climate, **kwargs)
-            stores.append(store)
-    
-    nudged_stores = []
-    for climate in NUDGED:
-        root = NUDGED[climate]
-        for tape, kwargs in NUDGED_TAPES.items():
-            url = os.path.join(root, f"{tape}.zarr")
-            store = CoarseStore(url, "Nudged", climate, **kwargs)
-            nudged_stores.append(store)
 
-    fine_resolution_stores_year_1 = []
-    fine_resolution_stores_year_2 = []
-    for climate, root in FINE_RES.items():
-        for tape, kwargs in FINE_RES_TAPES.items():
-            url = os.path.join(root, f"{tape}.zarr")
-            store_year_1 = FineStore(url, "Fine resolution (year one)", climate, **kwargs)
-            store_year_2 = FineStore(url, "Fine resolution (year two)", climate, **kwargs)
-            fine_resolution_stores_year_1.append(store_year_1)
-            fine_resolution_stores_year_2.append(store_year_2)
-
-    for climate, root in NUDGED.items():
-        for tape, kwargs in REFERENCE_TAPES.items():
-            url = os.path.join(root, f"{tape}.zarr")
-            store_year_1 = FineStore(url, "Fine resolution (year one)", climate, **kwargs)
-            store_year_2 = FineStore(url, "Fine resolution (year two)", climate, **kwargs)
-            fine_resolution_stores_year_1.append(store_year_1)
-            fine_resolution_stores_year_2.append(store_year_2)
-
-    ds_baseline_and_ml_corrected = xr.combine_by_coords([s.open() for s in stores])
-    ds_nudged = xr.combine_by_coords([s.open() for s in nudged_stores])
-    ds_fine_res_year_1 = xr.combine_by_coords([s.open(time_slice=slice("2017-08", "2018-07")) for s in fine_resolution_stores_year_1])
-    ds_fine_res_year_2 = xr.combine_by_coords([s.open(time_slice=slice("2018-08", "2019-07")) for s in fine_resolution_stores_year_2])
-    datasets = [ds_baseline_and_ml_corrected, ds_nudged, ds_fine_res_year_1, ds_fine_res_year_2]
-    result = xr.concat([d.chunk({"time": "auto"}) for d in datasets], dim="configuration")
-    result = result.chunk({"configuration": 1, "climate": 1})
+    result = xr.combine_by_coords([s.open() for s in stores])
+    result = result.chunk({"time": "auto", "configuration": 1, "climate": 1})
     result = result.sel(climate=CLIMATES)  # Ensure climates are ordered from coldest to warmest
 
     result.partition.initialize_store(DESTINATION)

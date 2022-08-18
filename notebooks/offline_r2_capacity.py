@@ -17,20 +17,11 @@ logging.basicConfig(level=logging.INFO)
 
 
 TEST_DATA = "gs://vcm-ml-experiments/spencerc/2022-06-28/n2f-25km-tapered-25-snoalb-nudging-tendencies-and-fluxes.zarr"
-MODELS = {
-    0: "gs://vcm-ml-experiments/spencerc/2022-06-20-nudge-to-25-km-ml-models/tq-nn-snoalb-tapered-clipped-25-seed-0",
-    1: "gs://vcm-ml-experiments/spencerc/2022-06-20-nudge-to-25-km-ml-models/tq-nn-snoalb-tapered-clipped-25-seed-1",
-    2: "gs://vcm-ml-experiments/spencerc/2022-06-20-nudge-to-25-km-ml-models/tq-nn-snoalb-tapered-clipped-25-seed-2",
-    3: "gs://vcm-ml-experiments/spencerc/2022-06-20-nudge-to-25-km-ml-models/tq-nn-snoalb-tapered-clipped-25-seed-3"
-}
+MODELS = {1: "gs://vcm-ml-experiments/spencerc/2022-08-12-trained-models/tq-nn-clr-clipped-tapered-25-seed-1"}
 LOADED_MODELS = {k: fv3fit.load(v) for k, v in MODELS.items()}
-TARGETS = ["dQ1", "dQ2"]
+TARGETS = ["tapered_dQ1", "tapered_dQ2"]
 TESTING_TIMES_FILE = "../workflows/ml-training/test.json"
-ALL_CLIMATE_DESTINATION = "offline-r2-all-climates.zarr"
-PER_CLIMATE_DESTINATION = "offline-r2-per-climate.zarr"
-
-TARGETS_DESTINATION = "mean-targets.zarr"
-PREDICTIONS_DESTINATION = "mean-predictions.zarr"
+ALL_CLIMATE_DESTINATION = "offline-r2-all-climates-capacity.zarr"
 
 
 def _predict_kernel(ds, model):
@@ -61,9 +52,10 @@ def weighted_groupby_bins(ds, weights, lat, bins=np.arange(-90, 91, 2)):
 
 
 def weighted_groupby_bins_variance(ds, mean, weights, lat, bins=np.arange(-90, 91, 2)):
-    mean_of_squares = weighted_groupby_bins(ds ** 2, weights, lat, bins=bins)
-    square_of_means = mean ** 2
-    return mean_of_squares - square_of_means
+    a = weighted_groupby_bins(ds ** 2, weights, lat, bins=bins)
+    b = -2 * mean * weighted_groupby_bins(ds, weights, lat, bins=bins)
+    c = mean ** 2
+    return a + b + c
 
 
 def coefficient_of_determination_by_lat(target, prediction, grid, bins=np.arange(-90, 91, 2)):
@@ -107,6 +99,10 @@ if __name__ == "__main__":
             grid.lat.load()
         )
     )
+    test_data = test_data.rename({
+        "dQ1": "tapered_dQ1",
+        "dQ2": "tapered_dQ2"
+    })
     targets = test_data[TARGETS]
 
     prediction_datasets = []
@@ -117,17 +113,6 @@ if __name__ == "__main__":
     interpolated_targets = interpolate(targets, test_data.pressure_thickness_of_atmospheric_layer)
     interpolated_predictions = interpolate(predictions, test_data.pressure_thickness_of_atmospheric_layer)
 
-    time_mean_targets = interpolated_targets.mean("time")
-    time_mean_predictions = interpolated_predictions.mean("time")
-
-    time_mean_targets = time_mean_targets.assign_coords(dataset=time_mean_targets.dataset.astype("<30U"))
-    time_mean_targets.to_zarr(TARGETS_DESTINATION)
-    time_mean_predictions = time_mean_predictions.assign_coords(dataset=time_mean_predictions.dataset.astype("<30U"))
-    write_via_xpartition(time_mean_predictions, PREDICTIONS_DESTINATION)
-
     all_climates = coefficient_of_determination_by_lat(interpolated_targets, interpolated_predictions, grid)
+    all_climates = all_climates.rename({"tapered_dQ1": "dQ1", "tapered_dQ2": "dQ2"})
     write_via_xpartition(all_climates, ALL_CLIMATE_DESTINATION)
-
-    per_climate = coefficient_of_determination_by_lat_dataset(interpolated_targets, interpolated_predictions, grid)
-    per_climate = per_climate.assign_coords(dataset=per_climate.dataset.astype(str))
-    write_via_xpartition(per_climate, PER_CLIMATE_DESTINATION)

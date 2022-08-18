@@ -6,8 +6,8 @@ import vcm
 import vcm.catalog
 import xarray as xr
 
-
-POST_PROCESSED_DATA = fsspec.get_mapper("gs://vcm-ml-experiments/spencerc/2022-07-13-n2f-25-km/post-processed-data-five-years-updated.zarr")
+ML_CORRECTED_POST_PROCESSED_DATA = fsspec.get_mapper("gs://vcm-ml-experiments/spencerc/2022-08-15-n2f-25-km/post-processed-data-v5.zarr")
+OTHER_POST_PROCESSED_DATA = fsspec.get_mapper("gs://vcm-ml-experiments/spencerc/2022-08-04-n2f-25-km/post-processed-data-v4.zarr")
 SPATIAL_DIMS = ["x", "y", "tile"]
 ZONAL_DIMS = ["lat", "pressure"]
 AS_AUG_CONFIGURATIONS = ["Fine resolution (year one)", "Fine resolution (year two)", "Nudged"]
@@ -149,7 +149,10 @@ def compute_climate_change_pattern(ds):
 
 
 if __name__ == "__main__":
-    ds = xr.open_zarr(POST_PROCESSED_DATA)
+    ml = xr.open_zarr(ML_CORRECTED_POST_PROCESSED_DATA)
+    other = xr.open_zarr(OTHER_POST_PROCESSED_DATA)
+    other = other.sel(configuration=[c for c in other.configuration.values if "ML-corrected" not in c])
+    ds = xr.concat([ml, other], dim="configuration")
     ds["net_surface_radiative_flux"] = net_surface_radiative_flux(ds)
     ds["total_precipitation_rate"] = SECONDS_PER_DAY * ds.total_precipitation_rate
     ds = ds[VARIABLES]
@@ -175,7 +178,7 @@ if __name__ == "__main__":
     merged_metrics = xr.merge([annual_mean_metrics_2d, annual_mean_metrics_3d])
     merged_climate_change_metrics = xr.merge([climate_change_metrics_2d, climate_change_metrics_3d])
     with dask.diagnostics.ProgressBar():
-        merged_bias.to_netcdf("annual_mean_bias.nc")
-        merged_climate_change_bias.to_netcdf("climate_change_bias.nc")
-        merged_metrics.to_netcdf("annual_mean_metrics.nc")
-        merged_climate_change_metrics.to_netcdf("climate_change_metrics.nc")
+        merged_bias.to_netcdf("annual_mean_bias_v5.nc")
+        merged_climate_change_bias.to_netcdf("climate_change_bias_v5.nc")
+        merged_metrics.to_netcdf("annual_mean_metrics_v5.nc")
+        merged_climate_change_metrics.to_netcdf("climate_change_metrics_v5.nc")
