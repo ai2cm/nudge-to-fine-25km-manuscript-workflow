@@ -320,7 +320,7 @@ restart_ml_corrected_sensitivity_runs_seed_3: deploy_fv3net_2022_07_08_ml_correc
 sensitivity_metrics:
 	python ./workflows/sensitivity-experiments/post_processing.py
 	python ./workflows/sensitivity-experiments/metrics.py
-	python ./notebooks/offline_r2_capacity.py
+	python ./workflows/sensitivity-experiments/offline_r2_capacity.py
 
 
 TRAIN_ROOT_SENSITIVITY_2=gs://vcm-ml-experiments/spencerc/2022-08-12-trained-models
