@@ -19,8 +19,11 @@ logging.basicConfig(level=logging.INFO)
 TEST_DATA = "gs://vcm-ml-experiments/spencerc/2022-06-28/n2f-25km-tapered-25-snoalb-nudging-tendencies-and-fluxes.zarr"
 MODELS = {1: "gs://vcm-ml-experiments/spencerc/2022-08-12-trained-models/tq-nn-clr-clipped-tapered-25-seed-1"}
 LOADED_MODELS = {k: fv3fit.load(v) for k, v in MODELS.items()}
+
+# For these models the targets were explicitly labeled "tapered" but in the test dataset
+# the tapered tendencies were simply called dQ1 and dQ2, so renaming is required.
 TARGETS = ["tapered_dQ1", "tapered_dQ2"]
-TESTING_TIMES_FILE = "../workflows/ml-training/test.json"
+TESTING_TIMES_FILE = "../ml-training/test.json"
 ALL_CLIMATE_DESTINATION = "offline-r2-all-climates-capacity.zarr"
 
 
